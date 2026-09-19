@@ -9,6 +9,7 @@ import {
   ApolloNextAppProvider,
   InMemoryCache,
 } from "@apollo/client-integration-nextjs";
+import { characterCacheTypePolicies } from "@/features/characters/api/cache-policies";
 import { isRetryableNetworkError } from "./retry-condition";
 
 const GRAPHQL_ENDPOINT =
@@ -43,7 +44,7 @@ function makeClient() {
   const httpLink = new HttpLink({ uri: GRAPHQL_ENDPOINT });
 
   return new ApolloClient({
-    cache: new InMemoryCache(),
+    cache: new InMemoryCache({ typePolicies: characterCacheTypePolicies }),
     link: ApolloLink.from([errorLink, retryLink, httpLink]),
   });
 }
