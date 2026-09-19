@@ -10,11 +10,16 @@ interface UseCharactersResult {
   characters: Character[];
   loading: boolean;
   error: boolean;
+  refetch: () => void;
 }
 
 /** Fetches page one of characters and returns them mapped to our domain type. */
 export function useCharacters(): UseCharactersResult {
-  const { data, loading, error } = useQuery(GetCharactersQuery);
+  const { data, loading, error, refetch } = useQuery(GetCharactersQuery, {
+    // re-flags `loading` during a retry, so the UI can fall back to the
+    // same skeleton state rather than needing a separate "retrying" state
+    notifyOnNetworkStatusChange: true,
+  });
 
   const characters = useMemo(() => {
     const results = data?.characters?.results ?? [];
@@ -25,5 +30,8 @@ export function useCharacters(): UseCharactersResult {
     characters,
     loading,
     error: Boolean(error),
+    refetch: () => {
+      void refetch();
+    },
   };
 }
