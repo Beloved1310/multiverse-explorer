@@ -1,17 +1,24 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { SkeletonCard } from "@/components/ui/skeleton-card";
 import { classifyResultState } from "@/lib/classify-result-state";
+import type { CharacterFilters } from "../filters/character-filters";
 import { useCharacters } from "../hooks/use-characters";
 import { CharacterCard } from "./character-card";
 
 const SKELETON_COUNT = 8;
 
-export function CharacterResults() {
-  const { characters, loading, error, refetch } = useCharacters();
-  const router = useRouter();
+interface CharacterResultsProps {
+  filters: CharacterFilters;
+  onClearFilters: () => void;
+}
+
+export function CharacterResults({
+  filters,
+  onClearFilters,
+}: CharacterResultsProps) {
+  const { characters, loading, error, refetch } = useCharacters(filters);
 
   const state = classifyResultState({
     loading,
@@ -42,11 +49,7 @@ export function CharacterResults() {
           <p className="text-body text-foreground">
             No characters match your search.
           </p>
-          {/* Clears the URL's query string. Currently unreachable in the
-              running app -- there's no filter UI to produce a zero-result
-              page yet (that lands with search/filters) -- but the action
-              is already correct for when it does. */}
-          <Button variant="secondary" onClick={() => router.push("/")}>
+          <Button variant="secondary" onClick={onClearFilters}>
             Clear filters
           </Button>
         </div>
