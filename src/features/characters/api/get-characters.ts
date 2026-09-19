@@ -5,6 +5,7 @@ export const GetCharactersQuery = graphql(`
     characters(filter: $filter, page: $page) {
       info {
         next
+        count
       }
       results {
         id

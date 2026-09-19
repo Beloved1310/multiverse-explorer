@@ -18,6 +18,7 @@ interface UseCharactersResult {
   loadingMore: boolean;
   error: boolean;
   hasMore: boolean;
+  totalCount: number | null;
   loadMore: () => void;
   refetch: () => void;
 }
@@ -51,6 +52,7 @@ export function useCharacters(filters: CharacterFilters): UseCharactersResult {
 
   const nextPage = data?.characters?.info?.next ?? null;
   const hasMore = nextPage !== null;
+  const totalCount = data?.characters?.info?.count ?? null;
 
   const loadMore = useCallback(() => {
     if (isFetchingMoreRef.current || nextPage === null) return;
@@ -79,6 +81,7 @@ export function useCharacters(filters: CharacterFilters): UseCharactersResult {
     loadingMore,
     error: Boolean(error),
     hasMore,
+    totalCount,
     loadMore,
     refetch: () => {
       void refetch();
