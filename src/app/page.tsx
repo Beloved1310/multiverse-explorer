@@ -1,33 +1,38 @@
 "use client";
 
-import { useQuery } from "@apollo/client/react";
-import { graphql } from "@/lib/graphql/generated";
+import { SkeletonCard } from "@/components/ui/skeleton-card";
+import { CharacterCard } from "@/features/characters/components/character-card";
+import { useCharacters } from "@/features/characters/hooks/use-characters";
 
-const GetCharacterNames = graphql(`
-  query GetCharacterNames {
-    characters {
-      results {
-        id
-        name
-      }
-    }
-  }
-`);
+const SKELETON_COUNT = 8;
 
 export default function Home() {
-  const { data, loading, error } = useQuery(GetCharacterNames);
+  const { characters, loading, error } = useCharacters();
 
   return (
-    <main className="flex flex-1 flex-col items-center gap-6 p-8">
-      <h1 className="text-2xl font-semibold">Multiverse Explorer</h1>
-      {loading && <p>Loading characters…</p>}
-      {error && <p role="alert">Failed to load characters.</p>}
-      {data && (
-        <ul className="list-disc">
-          {data.characters?.results?.map((character) => (
-            <li key={character?.id}>{character?.name}</li>
-          ))}
-        </ul>
+    <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+      <p role="status" aria-live="polite" className="sr-only">
+        {loading
+          ? "Loading characters"
+          : error
+            ? "Failed to load characters"
+            : `${characters.length} characters loaded`}
+      </p>
+
+      {error ? (
+        <p className="text-body text-status-dead-fg">
+          Something went wrong loading characters.
+        </p>
+      ) : (
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
+          {loading
+            ? Array.from({ length: SKELETON_COUNT }).map((_, index) => (
+                <SkeletonCard key={index} />
+              ))
+            : characters.map((character) => (
+                <CharacterCard key={character.id} character={character} />
+              ))}
+        </div>
       )}
     </main>
   );
