@@ -8,11 +8,13 @@ import { Card } from "./card";
 export function SkeletonCard() {
   return (
     <Card aria-hidden="true" className="overflow-hidden">
-      <div className="aspect-square w-full animate-pulse bg-foreground-muted/20" />
-      <div className="space-y-2 p-4">
-        <div className="h-5 w-3/4 animate-pulse rounded bg-foreground-muted/20" />
-        <div className="h-4 w-1/2 animate-pulse rounded bg-foreground-muted/20" />
-        <div className="h-4 w-2/3 animate-pulse rounded bg-foreground-muted/20" />
+      <div className="h-1 w-full bg-foreground-muted/20" />
+      <div className="relative aspect-square w-full animate-pulse bg-foreground-muted/20">
+        <div className="absolute inset-x-3 bottom-3 h-5 w-2/3 rounded bg-foreground-muted/30" />
+      </div>
+      <div className="space-y-1.5 p-3">
+        <div className="h-3.5 w-1/2 animate-pulse rounded bg-foreground-muted/20" />
+        <div className="h-3.5 w-2/3 animate-pulse rounded bg-foreground-muted/20" />
       </div>
     </Card>
   );

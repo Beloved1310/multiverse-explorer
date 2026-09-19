@@ -5,6 +5,7 @@ type BadgeTone = "alive" | "dead" | "unknown";
 interface BadgeProps {
   tone: BadgeTone;
   children: ReactNode;
+  className?: string;
 }
 
 const TONE_CLASSES: Record<BadgeTone, string> = {
@@ -23,10 +24,10 @@ const DOT_CLASSES: Record<BadgeTone, string> = {
  * Status is always conveyed through the text label, never colour alone --
  * the dot is decorative (aria-hidden) and purely reinforces it visually.
  */
-export function Badge({ tone, children }: BadgeProps) {
+export function Badge({ tone, children, className = "" }: BadgeProps) {
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-caption font-medium ${TONE_CLASSES[tone]}`}
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-caption font-medium shadow-sm ${TONE_CLASSES[tone]} ${className}`}
     >
       <span
         aria-hidden="true"

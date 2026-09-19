@@ -95,7 +95,22 @@
 }
 
 body {
-  background: var(--color-background);
+  background-color: var(--color-background);
+  /* a soft two-tone "portal glow" wash -- brand identity, not decoration
+     for its own sake -- fades into the ordinary background within the
+     first viewport so it never competes with content. */
+  background-image:
+    radial-gradient(
+      ellipse 70% 45% at 8% -10%,
+      color-mix(in oklch, var(--color-brand) 14%, transparent),
+      transparent
+    ),
+    radial-gradient(
+      ellipse 55% 35% at 100% 0%,
+      color-mix(in oklch, var(--color-accent) 12%, transparent),
+      transparent
+    );
+  background-repeat: no-repeat;
   color: var(--color-foreground);
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 }
