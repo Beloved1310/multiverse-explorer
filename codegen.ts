@@ -1,24 +1,15 @@
 import type { CodegenConfig } from "@graphql-codegen/cli";
 
-const GRAPHQL_API_URL =
-  process.env.NEXT_PUBLIC_GRAPHQL_API_URL ??
+const GRAPHQL_ENDPOINT =
+  process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT ??
   "https://rickandmortyapi.com/graphql";
 
 const config: CodegenConfig = {
-  schema: GRAPHQL_API_URL,
-  documents: ["src/**/*.graphql"],
-  ignoreNoDocuments: true,
+  schema: GRAPHQL_ENDPOINT,
+  documents: ["src/**/*.{ts,tsx}", "!src/lib/graphql/generated/**"],
   generates: {
-    "src/gql/generated.ts": {
-      plugins: [
-        "typescript",
-        "typescript-operations",
-        "typescript-react-apollo",
-      ],
-      config: {
-        withHooks: true,
-        avoidOptionals: true,
-      },
+    "src/lib/graphql/generated/": {
+      preset: "client",
     },
   },
 };
