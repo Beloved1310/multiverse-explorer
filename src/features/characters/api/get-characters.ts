@@ -1,8 +1,8 @@
 import { graphql } from "@/lib/graphql/generated";
 
 export const GetCharactersQuery = graphql(`
-  query GetCharacters {
-    characters {
+  query GetCharacters($filter: FilterCharacter) {
+    characters(filter: $filter) {
       results {
         id
         name
