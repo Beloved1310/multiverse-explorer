@@ -4,7 +4,7 @@ import {
   countActiveFilters,
   parseCharacterFiltersFromSearchParams,
   toGraphQLCharacterFilter,
-} from "./character-filters";
+} from "@/features/characters/filters/character-filters";
 
 describe("parseCharacterFiltersFromSearchParams", () => {
   it("parses a complete, valid set of filters", () => {

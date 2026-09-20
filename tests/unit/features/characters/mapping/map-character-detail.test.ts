@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   mapCharacterDetail,
   type ApiCharacterDetail,
-} from "./map-character-detail";
+} from "@/features/characters/mapping/map-character-detail";
 
 function buildApiCharacterDetail(
   overrides: Partial<ApiCharacterDetail> = {},

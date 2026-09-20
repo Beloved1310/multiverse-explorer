@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { CombinedGraphQLErrors } from "@apollo/client/errors";
-import { isRetryableNetworkError } from "./retry-condition";
+import { isRetryableNetworkError } from "@/lib/apollo/retry-condition";
 
 describe("isRetryableNetworkError", () => {
   it("returns true for a network error", () => {

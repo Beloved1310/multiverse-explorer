@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { classifyResultState } from "./classify-result-state";
+import { classifyResultState } from "@/lib/classify-result-state";
 
 describe("classifyResultState", () => {
   it("returns 'loading' while the request is in flight", () => {

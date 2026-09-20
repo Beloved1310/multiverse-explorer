@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { mapCharacter, type ApiCharacter } from "./map-character";
+import {
+  mapCharacter,
+  type ApiCharacter,
+} from "@/features/characters/mapping/map-character";
 
 function buildApiCharacter(
   overrides: Partial<ApiCharacter> = {},
@@ -78,5 +81,16 @@ describe("mapCharacter", () => {
     const character = mapCharacter(buildApiCharacter({ status: null }));
 
     expect(character.status).toBe("unknown");
+  });
+
+  it("handles a genuinely absent episode field without throwing (returnPartialData)", () => {
+    // mapCharacter is reused for location residents and episode casts,
+    // both of which enable returnPartialData -- this simulates a
+    // resident/cast member arriving before its episode field has loaded.
+    const { episode, ...partialCharacter } = buildApiCharacter();
+    void episode; // intentionally discarded -- that's the point of this fixture
+
+    expect(() => mapCharacter(partialCharacter)).not.toThrow();
+    expect(mapCharacter(partialCharacter).episodes).toEqual([]);
   });
 });
