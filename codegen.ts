@@ -1,11 +1,12 @@
 import type { CodegenConfig } from "@graphql-codegen/cli";
+import { typeDefs } from "./src/server/graphql/type-defs";
 
-const GRAPHQL_ENDPOINT =
-  process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT ??
-  "https://rickandmortyapi.com/graphql";
+// The browser queries /api/graphql. Codegen consumes the same route's SDL
+// directly so it can run without a local server already listening.
+const BFF_SCHEMA = typeDefs;
 
 const config: CodegenConfig = {
-  schema: GRAPHQL_ENDPOINT,
+  schema: BFF_SCHEMA,
   documents: ["src/**/*.{ts,tsx}", "!src/lib/graphql/generated/**"],
   generates: {
     "src/lib/graphql/generated/": {
