@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ChevronRightIcon } from "@/components/ui/icons";
 import { Card } from "@/components/ui/card";
+import { CuratedCollections } from "@/features/characters/components/curated-collections";
 
 const SECTIONS = [
   {
@@ -89,6 +90,8 @@ export default function Home() {
           </Link>
         ))}
       </div>
+
+      <CuratedCollections />
     </main>
   );
 }
