@@ -21,7 +21,6 @@ If more time were available, the next improvements would focus on reliability, d
 - Deploy the application, PostgreSQL database, migrations, and environment configuration to a managed production platform.
 - Add error monitoring, structured server logs, and a health endpoint for the GraphQL service and data snapshot fallback.
 - Add scheduled snapshot refreshes and alerting when the public Rick and Morty API cannot be reached.
-- Redis is now an optional shared cache for the connected catalogue. Configure `REDIS_URL` when the app runs across multiple server instances; reads use cache-aside behaviour and safely fall back to Next.js cache and the snapshot if Redis is unavailable.
 - Introduce database-backed analytics only after defining clear product questions and a privacy-aware retention policy.
 
 ## Scale
