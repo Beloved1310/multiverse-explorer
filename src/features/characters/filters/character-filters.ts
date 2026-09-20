@@ -1,4 +1,7 @@
 import type { FilterCharacter } from "@/lib/graphql/generated/graphql";
+import { STATUS_LABELS } from "../domain/character";
+
+export { STATUS_LABELS };
 
 export interface CharacterFilters {
   name: string;
@@ -36,15 +39,6 @@ export const CHARACTER_SPECIES_OPTIONS = [
   "Disease",
   "unknown",
 ] as const;
-
-export const STATUS_LABELS: Record<
-  (typeof CHARACTER_STATUS_OPTIONS)[number],
-  string
-> = {
-  alive: "Alive",
-  dead: "Dead",
-  unknown: "Unknown",
-};
 
 export const GENDER_LABELS: Record<
   (typeof CHARACTER_GENDER_OPTIONS)[number],

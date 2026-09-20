@@ -3,13 +3,11 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { MapPinIcon, SparkleIcon } from "@/components/ui/icons";
-import type { Character, CharacterStatus } from "../domain/character";
-
-const STATUS_LABEL: Record<CharacterStatus, string> = {
-  alive: "Alive",
-  dead: "Dead",
-  unknown: "Unknown",
-};
+import {
+  STATUS_LABELS,
+  type Character,
+  type CharacterStatus,
+} from "../domain/character";
 
 const STATUS_ACCENT: Record<CharacterStatus, string> = {
   alive: "bg-status-alive-fg",
@@ -66,7 +64,7 @@ export function CharacterCard({ character }: CharacterCardProps) {
             tone={character.status}
             className="absolute top-2 right-2 backdrop-blur-sm"
           >
-            {STATUS_LABEL[character.status]}
+            {STATUS_LABELS[character.status]}
           </Badge>
         </div>
 

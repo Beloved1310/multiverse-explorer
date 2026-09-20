@@ -1,3 +1,5 @@
+import { UNKNOWN_VALUE } from "@/lib/normalize-text";
+
 const GRAPHQL_ENDPOINT =
   process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT ??
   "https://rickandmortyapi.com/graphql";
@@ -46,8 +48,8 @@ export async function fetchCharacterMetadata(
 
     return {
       name: character.name,
-      status: character.status ?? "unknown",
-      species: character.species ?? "Unknown",
+      status: character.status ?? UNKNOWN_VALUE,
+      species: character.species ?? UNKNOWN_VALUE,
     };
   } catch {
     return null;

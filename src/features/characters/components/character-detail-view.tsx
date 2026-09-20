@@ -2,9 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { BackLink } from "@/components/back-link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { StatusPanel } from "@/components/ui/status-panel";
 import {
   AlertIcon,
   CalendarIcon,
@@ -15,15 +17,8 @@ import type {
   CharacterEpisode,
   CharacterLocationRef,
 } from "../domain/character-detail";
-import type { CharacterStatus } from "../domain/character";
+import { STATUS_LABELS } from "../domain/character";
 import { useCharacterDetail } from "../hooks/use-character-detail";
-import { BackToListLink } from "./back-to-list-link";
-
-const STATUS_LABEL: Record<CharacterStatus, string> = {
-  alive: "Alive",
-  dead: "Dead",
-  unknown: "Unknown",
-};
 
 // The domain model deliberately keeps gender lowercase (see
 // normalize-character-fields.ts); this is purely a display concern.
@@ -46,7 +41,7 @@ export function CharacterDetailView({ id }: CharacterDetailViewProps) {
 
   return (
     <div className="space-y-6">
-      <BackToListLink />
+      <BackLink label="Back to the multiverse" />
 
       <Card className="overflow-hidden">
         <div className="grid gap-6 p-6 sm:grid-cols-[16rem_1fr] sm:p-8">
@@ -76,7 +71,7 @@ export function CharacterDetailView({ id }: CharacterDetailViewProps) {
                 {character.name}
               </h2>
               <Badge tone={character.status}>
-                {STATUS_LABEL[character.status]}
+                {STATUS_LABELS[character.status]}
               </Badge>
             </div>
 
@@ -217,20 +212,13 @@ function DetailSkeleton() {
 function NotFoundState() {
   return (
     <div className="space-y-6">
-      <BackToListLink />
-      <div className="flex flex-col items-center gap-4 py-16 text-center">
-        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-subtle text-brand">
-          <EmptyIcon className="h-6 w-6" />
-        </span>
-        <div className="space-y-1">
-          <p className="text-body font-medium text-foreground">
-            This being doesn&apos;t exist in any reality we&apos;ve found.
-          </p>
-          <p className="text-caption text-foreground-muted">
-            Double-check the link, or head back and search the multiverse.
-          </p>
-        </div>
-      </div>
+      <BackLink label="Back to the multiverse" />
+      <StatusPanel
+        tone="brand"
+        icon={<EmptyIcon className="h-6 w-6" />}
+        heading="This being doesn't exist in any reality we've found."
+        description="Double-check the link, or head back and search the multiverse."
+      />
     </div>
   );
 }
@@ -238,22 +226,14 @@ function NotFoundState() {
 function ErrorState({ onRetry }: { onRetry: () => void }) {
   return (
     <div className="space-y-6">
-      <BackToListLink />
-      <div className="flex flex-col items-center gap-4 py-16 text-center">
-        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-status-dead-bg text-status-dead-fg">
-          <AlertIcon className="h-6 w-6" />
-        </span>
-        <div className="space-y-1">
-          <p className="text-body font-medium text-foreground">
-            Something glitched in this dimension.
-          </p>
-          <p className="text-caption text-foreground-muted">
-            We couldn&apos;t reach the multiverse&apos;s database. Check your
-            connection and try again.
-          </p>
-        </div>
-        <Button onClick={onRetry}>Retry</Button>
-      </div>
+      <BackLink label="Back to the multiverse" />
+      <StatusPanel
+        tone="danger"
+        icon={<AlertIcon className="h-6 w-6" />}
+        heading="Something glitched in this dimension."
+        description="We couldn't reach the multiverse's database. Check your connection and try again."
+        action={<Button onClick={onRetry}>Retry</Button>}
+      />
     </div>
   );
 }
