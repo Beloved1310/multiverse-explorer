@@ -6,7 +6,6 @@ import { useState } from "react";
 import { CloseIcon, MenuIcon } from "@/components/ui/icons";
 
 const NAV_ITEMS = [
-  { href: "/", label: "Home" },
   { href: "/characters", label: "Characters" },
   { href: "/locations", label: "Locations" },
   { href: "/episodes", label: "Episodes" },
@@ -46,6 +45,11 @@ function NavLinks({ onNavigate, linkClassName = "" }: NavLinksProps) {
 
 export function SiteHeader() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const pathname = usePathname();
+
+  // The landing page is intentionally a quiet, logo-led welcome. Navigation
+  // begins once a visitor enters an explorer view.
+  if (pathname === "/") return null;
 
   return (
     <header className="sticky top-0 z-10 border-b border-border bg-background/80 backdrop-blur-md">
