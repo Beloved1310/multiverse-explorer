@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { href: "/characters", label: "Characters" },
   { href: "/locations", label: "Locations" },
   { href: "/episodes", label: "Episodes" },
+  { href: "/compare", label: "Compare" },
 ] as const;
 
 interface NavLinksProps {
