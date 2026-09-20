@@ -13,7 +13,7 @@ export function CharacterBrowser() {
       <div className="flex flex-col gap-2">
         <h1 className="text-display font-bold text-foreground">Characters</h1>
         <p className="text-body text-foreground-muted">
-          Every being, every reality &mdash; search and filter the multiverse.
+          Search and filter characters.
         </p>
       </div>
       <CharacterFilterBar

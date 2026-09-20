@@ -13,7 +13,7 @@ export function EpisodeBrowser() {
       <div className="flex flex-col gap-2">
         <h1 className="text-display font-bold text-foreground">Episodes</h1>
         <p className="text-body text-foreground-muted">
-          Every episode the multiverse has aired &mdash; search by name or code.
+          Search episodes by name or code.
         </p>
       </div>
       <EpisodeFilterBar

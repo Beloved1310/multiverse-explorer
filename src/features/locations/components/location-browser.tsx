@@ -13,8 +13,7 @@ export function LocationBrowser() {
       <div className="flex flex-col gap-2">
         <h1 className="text-display font-bold text-foreground">Locations</h1>
         <p className="text-body text-foreground-muted">
-          Every place worth (or not worth) visiting &mdash; search by name,
-          type, or dimension.
+          Search locations by name, type, or dimension.
         </p>
       </div>
       <LocationFilterBar

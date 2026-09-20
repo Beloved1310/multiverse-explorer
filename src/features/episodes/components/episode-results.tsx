@@ -62,8 +62,8 @@ export function EpisodeResults({
         <StatusPanel
           tone="danger"
           icon={<AlertIcon className="h-6 w-6" />}
-          heading="Something glitched in this dimension."
-          description="We couldn't reach the multiverse's database. Check your connection and try again."
+          heading="Could not load episodes."
+          description="Check your connection and try again."
           action={<Button onClick={refetch}>Retry</Button>}
         />
       )}
@@ -116,7 +116,7 @@ export function EpisodeResults({
               {loadingMore && (
                 <p className="flex items-center gap-2 text-caption text-foreground-muted">
                   <SpinnerIcon className="h-4 w-4 text-brand" />
-                  Pulling more episodes through the portal&hellip;
+                  Loading more episodes&hellip;
                 </p>
               )}
               {!loadingMore && hasMore && (

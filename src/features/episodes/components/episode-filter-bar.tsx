@@ -39,7 +39,7 @@ export function EpisodeFilterBar({
   }, [debouncedName, debouncedCode, onFiltersChange]);
 
   return (
-    <Card className="sticky top-16 z-5 flex flex-col gap-4 bg-background/85 p-4 backdrop-blur-md">
+    <Card className="sticky top-16 z-5 flex flex-col gap-4 border-brand/15 bg-background/95 p-3 shadow-md backdrop-blur-md sm:p-4">
       <div className="flex flex-col gap-1.5">
         <label htmlFor="episode-search" className="sr-only">
           Search by name
@@ -53,7 +53,7 @@ export function EpisodeFilterBar({
             onChange={(event) => setNameInput(event.target.value)}
             placeholder="Search episodes…"
             autoComplete="off"
-            className="w-full rounded-control border border-border bg-background py-2.5 pr-4 pl-10 text-body text-foreground shadow-sm focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
+            className="w-full rounded-control border border-border bg-background py-3 pr-4 pl-10 text-body text-foreground shadow-sm placeholder:text-foreground-muted/75 focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
           />
         </div>
       </div>
@@ -76,7 +76,7 @@ export function EpisodeFilterBar({
           />
         </div>
 
-        <div className="ml-auto flex items-center gap-3">
+        <div className="flex w-full items-center justify-between gap-3 border-t border-border pt-3 sm:ml-auto sm:w-auto sm:border-0 sm:pt-0">
           <span
             className="inline-flex items-center gap-1.5 text-caption text-foreground-muted"
             aria-live="polite"
@@ -88,7 +88,7 @@ export function EpisodeFilterBar({
             )}
             {activeFilterCount > 0
               ? `filter${activeFilterCount === 1 ? "" : "s"} applied`
-              : "Showing every episode"}
+              : "All episodes"}
           </span>
           <Button
             variant="secondary"

@@ -84,8 +84,8 @@ function NotFoundState() {
       <StatusPanel
         tone="brand"
         icon={<EmptyIcon className="h-6 w-6" />}
-        heading="This episode doesn't exist in any reality we've found."
-        description="Double-check the link, or head back and browse the episode list."
+        heading="Episode not found."
+        description="Check the link or return to the episode list."
       />
     </div>
   );
@@ -98,8 +98,8 @@ function ErrorState({ onRetry }: { onRetry: () => void }) {
       <StatusPanel
         tone="danger"
         icon={<AlertIcon className="h-6 w-6" />}
-        heading="Something glitched in this dimension."
-        description="We couldn't reach the multiverse's database. Check your connection and try again."
+        heading="Could not load this episode."
+        description="Check your connection and try again."
         action={<Button onClick={onRetry}>Retry</Button>}
       />
     </div>
