@@ -1,4 +1,4 @@
-# 010. Reject deeply nested queries before they run
+# 3. Reject deeply nested queries before they run
 
 ## Status
 

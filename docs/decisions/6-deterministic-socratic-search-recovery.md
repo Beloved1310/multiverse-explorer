@@ -1,4 +1,4 @@
-# 013. Deterministic Socratic search recovery instead of LLM ranking
+# 6. Deterministic Socratic search recovery instead of LLM ranking
 
 ## Status
 

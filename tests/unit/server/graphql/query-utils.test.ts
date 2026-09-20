@@ -5,10 +5,12 @@ import {
   findSharedEpisodes,
   findSharedLocations,
   paginate,
+  selectCharacterEpisodesInSeason,
   selectCharactersWithUnknownOrigins,
   selectMostPopulatedLocations,
   selectMostSeenCharacters,
   sortCharacters,
+  summarizeCharacterEpisodeSeasons,
 } from "@/server/graphql/query-utils";
 import type {
   ConnectedCharacter,
@@ -160,6 +162,77 @@ describe("findSharedEpisodes", () => {
     expect(
       findSharedEpisodes(first, second, episodes).map(({ id }) => id),
     ).toEqual(["e2"]);
+  });
+});
+
+function seasonEpisode(
+  id: string,
+  season: number | null,
+  episodeNumber: number | null,
+): ConnectedEpisode {
+  return {
+    id,
+    name: `Episode ${id}`,
+    code: season === null ? "TBA" : `S0${season}E0${episodeNumber}`,
+    airDate: "December 2, 2013",
+    characterIds: [],
+    season,
+    episodeNumber,
+  };
+}
+
+describe("summarizeCharacterEpisodeSeasons", () => {
+  it("counts episodes per season, ascending, with the unparsed group last", () => {
+    const episodes = [
+      seasonEpisode("1", 1, 1),
+      seasonEpisode("2", 1, 2),
+      seasonEpisode("3", 2, 1),
+      seasonEpisode("4", null, null),
+      // Not one of this character's episodes -- must not be counted.
+      seasonEpisode("5", 1, 3),
+    ];
+
+    expect(
+      summarizeCharacterEpisodeSeasons(["1", "2", "3", "4"], episodes),
+    ).toEqual([
+      { season: 1, count: 2 },
+      { season: 2, count: 1 },
+      { season: null, count: 1 },
+    ]);
+  });
+
+  it("returns an empty list for a character with no episodes", () => {
+    expect(
+      summarizeCharacterEpisodeSeasons([], [seasonEpisode("1", 1, 1)]),
+    ).toEqual([]);
+  });
+});
+
+describe("selectCharacterEpisodesInSeason", () => {
+  it("returns only that character's episodes from the requested season, in episode order", () => {
+    const episodes = [
+      seasonEpisode("1", 1, 2),
+      seasonEpisode("2", 1, 1),
+      seasonEpisode("3", 2, 1),
+      // Not this character's episode -- must be excluded even though it's season 1.
+      seasonEpisode("4", 1, 3),
+    ];
+
+    expect(
+      selectCharacterEpisodesInSeason(["1", "2", "3"], 1, episodes).map(
+        ({ id }) => id,
+      ),
+    ).toEqual(["2", "1"]);
+  });
+
+  it("selects the unparsed-code group with season: null", () => {
+    const episodes = [seasonEpisode("1", 1, 1), seasonEpisode("2", null, null)];
+
+    expect(
+      selectCharacterEpisodesInSeason(["1", "2"], null, episodes).map(
+        ({ id }) => id,
+      ),
+    ).toEqual(["2"]);
   });
 });
 

@@ -1,0 +1,11 @@
+# AI workflow notes
+
+I used AI as a pair-programming and review tool, not as an unreviewed code generator. It helped me turn product requirements into small implementation tasks, inspect unfamiliar parts of the codebase, and identify repeated UI and data-layer patterns. I used it to draft React components, GraphQL queries, tests, architecture decision records, and documentation. I also used it to investigate errors such as invalid GraphQL documents and stale generated types.
+
+The workflow was iterative. I first asked for an explanation or implementation plan, reviewed the proposed approach against the existing architecture, then made or requested scoped changes. For each meaningful change, I checked the affected files, ran linting and TypeScript checks, and ran the closest unit or integration tests. I also used production builds where appropriate. This mattered because generated code can look plausible while still breaking an accessible name, a URL-state transition, or a GraphQL operation.
+
+Two examples show where I changed the initial direction. First, the locations feature began with a stylised map. The API has no real location coordinates, so the map would have implied false geography. I removed it rather than keeping an attractive but misleading visual. Second, saved filters initially used browser storage. I recognised that saved searches need identity and cross-device access, so I moved the design toward an authenticated, owner-scoped PostgreSQL model with a GraphQL API, while retaining URL parameters as the shareable format.
+
+I also used AI feedback critically for UI work. A first visual direction used a lavender gradient, uppercase brows, and oversized cards. It felt generic rather than specific to Rick and Morty, so I removed the decorative gradient, made search matches visible, tightened card density, and placed advanced character filters behind a disclosure. The final choices came from reviewing the user task and the running application, not from accepting the first suggestion unchanged.
+
+For an interview, I would describe AI as speeding up exploration and routine implementation. The responsibility for architecture, trade-offs, accessibility, testing, and the final product decision remained mine.

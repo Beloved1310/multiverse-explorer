@@ -1,4 +1,4 @@
-# 011. Saved character filters live in the browser, not on a server
+# 4. Saved character filters live in the browser, not on a server
 
 ## Status
 
@@ -6,7 +6,7 @@ Accepted
 
 ## Context
 
-We want people to save a named combination of filters (e.g. "Alive humans, 5+ episodes") and reuse it later. Doing that on a server means user accounts, a login flow, and a database — all of which [008](008-backend-for-frontend-with-cached-dataset.md) already ruled out for this phase, since the app has no concept of a signed-in user at all.
+We want people to save a named combination of filters (e.g. "Alive humans, 5+ episodes") and reuse it later. Doing that on a server means user accounts, a login flow, and a database — all of which [1](1-backend-for-frontend-with-cached-dataset.md) already ruled out for this phase, since the app has no concept of a signed-in user at all.
 
 ## Decision
 

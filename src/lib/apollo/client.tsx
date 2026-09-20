@@ -46,6 +46,17 @@ const retryLink = new RetryLink({
 // Each feature's policies only ever touch their own Query fields
 // (characters/character, episodes/episode, locations/location), so merging
 // their `Query.fields` objects is safe -- no feature can clobber another's.
+//
+// Watch out: if a feature's cache-policies.ts ever adds a policy for one of
+// its own *types* (e.g. `Character: { fields: {...} } }`, not `Query`),
+// it must be composed in here too, the same way `Query.fields` is below.
+// This composition once silently dropped exactly such a policy (a
+// Character.episodesInSeason pagination merge) because only `Query` was
+// ever spread -- the query still ran, it just re-fetched instead of
+// paginating, since Apollo fell back to its default field behavior with no
+// visible error. That specific policy is gone now (episode pagination
+// moved to discrete prev/next pages, which don't need a merge function),
+// but the composition gap that hid it is the thing to remember.
 const typePolicies: TypePolicies = {
   Query: {
     fields: {

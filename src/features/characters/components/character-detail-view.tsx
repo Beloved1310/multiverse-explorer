@@ -9,7 +9,7 @@ import { Card } from "@/components/ui/card";
 import { StatusPanel } from "@/components/ui/status-panel";
 import { AlertIcon, EmptyIcon, SpinnerIcon } from "@/components/ui/icons";
 import type {
-  CharacterEpisode,
+  CharacterEpisodeSeasonSummary,
   CharacterLocationRef,
 } from "../domain/character-detail";
 import { STATUS_LABELS } from "../domain/character";
@@ -63,9 +63,9 @@ export function CharacterDetailView({ id }: CharacterDetailViewProps) {
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <h2 className="text-display font-bold text-foreground">
+              <h1 className="text-display font-bold text-foreground">
                 {character.name}
-              </h2>
+              </h1>
               <Badge tone={character.status}>
                 {STATUS_LABELS[character.status]}
               </Badge>
@@ -81,11 +81,22 @@ export function CharacterDetailView({ id }: CharacterDetailViewProps) {
                 <LocationRefValue location={character.location} />
               </Attribute>
             </dl>
+            <Link
+              href={`/compare?first=${encodeURIComponent(character.id)}`}
+              className="inline-flex rounded-control border border-border px-4 py-2 text-body font-medium text-foreground hover:bg-surface-elevated focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
+            >
+              Compare with another character
+            </Link>
           </div>
         </div>
       </Card>
 
-      <EpisodesSection episodes={character.episodes} stillLoading={loading} />
+      <EpisodesSection
+        characterId={character.id}
+        episodeCount={character.episodeCount}
+        episodeSeasons={character.episodeSeasons}
+        stillLoading={loading}
+      />
     </div>
   );
 }
@@ -121,28 +132,38 @@ function LocationRefValue({ location }: { location: CharacterLocationRef }) {
 }
 
 function EpisodesSection({
-  episodes,
+  characterId,
+  episodeCount,
+  episodeSeasons,
   stillLoading,
 }: {
-  episodes: CharacterEpisode[];
+  characterId: string;
+  episodeCount: number;
+  episodeSeasons: CharacterEpisodeSeasonSummary[];
   stillLoading: boolean;
 }) {
   return (
     <Card className="p-6 sm:p-8">
-      {episodes.length === 0 && stillLoading && (
+      {episodeCount === 0 && stillLoading && (
         <p className="flex items-center gap-2 text-caption text-foreground-muted">
           <SpinnerIcon className="h-4 w-4 text-brand" />
           Loading episodes&hellip;
         </p>
       )}
 
-      {episodes.length === 0 && !stillLoading && (
+      {episodeCount === 0 && !stillLoading && (
         <p className="text-caption text-foreground-muted">
           No episode appearances on record.
         </p>
       )}
 
-      {episodes.length > 0 && <CharacterEpisodeList episodes={episodes} />}
+      {episodeCount > 0 && (
+        <CharacterEpisodeList
+          characterId={characterId}
+          episodeCount={episodeCount}
+          episodeSeasons={episodeSeasons}
+        />
+      )}
     </Card>
   );
 }

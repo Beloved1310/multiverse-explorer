@@ -16,20 +16,8 @@ function buildApiCharacterDetail(
     gender: "Male",
     origin: { id: "1", name: "Earth (C-137)" },
     location: { id: "3", name: "Citadel of Ricks" },
-    episode: [
-      {
-        id: "1",
-        name: "Pilot",
-        episode: "S01E01",
-        air_date: "December 2, 2013",
-      },
-      {
-        id: "2",
-        name: "Lawnmower Dog",
-        episode: "S01E02",
-        air_date: "December 9, 2013",
-      },
-    ],
+    episodeCount: 2,
+    episodeSeasons: [{ season: 1, count: 2 }],
     ...overrides,
   };
 }
@@ -47,26 +35,25 @@ describe("mapCharacterDetail", () => {
       gender: "male",
       origin: { id: "1", name: "Earth (C-137)" },
       location: { id: "3", name: "Citadel of Ricks" },
-      episodes: [
-        { id: "1", name: "Pilot", code: "S01E01", airDate: "December 2, 2013" },
-        {
-          id: "2",
-          name: "Lawnmower Dog",
-          code: "S01E02",
-          airDate: "December 9, 2013",
-        },
-      ],
+      episodeCount: 2,
+      episodeSeasons: [{ season: 1, count: 2 }],
     });
   });
 
   it("falls back to safe defaults for missing optional fields", () => {
     const character = mapCharacterDetail(
-      buildApiCharacterDetail({ name: null, image: null, episode: [] }),
+      buildApiCharacterDetail({
+        name: null,
+        image: null,
+        episodeCount: null,
+        episodeSeasons: [],
+      }),
     );
 
     expect(character.name).toBe("Unknown");
     expect(character.imageUrl).toBe("");
-    expect(character.episodes).toEqual([]);
+    expect(character.episodeCount).toBe(0);
+    expect(character.episodeSeasons).toEqual([]);
   });
 
   it("gives origin/location a null id when the location is unknown, not a real entity", () => {
@@ -81,30 +68,35 @@ describe("mapCharacterDetail", () => {
     expect(character.location).toEqual({ id: null, name: "Unknown" });
   });
 
-  it("handles null episode entries and a null episode code/air date without throwing", () => {
+  it("keeps a null season (the unparsed-code group) as null, not a default", () => {
     const character = mapCharacterDetail(
       buildApiCharacterDetail({
-        episode: [
-          null,
-          { id: "3", name: "Anatomy Park", episode: null, air_date: null },
+        episodeSeasons: [
+          { season: 1, count: 2 },
+          { season: null, count: 1 },
         ],
       }),
     );
 
-    expect(character.episodes).toEqual([
-      { id: "3", name: "Anatomy Park", code: "Unknown", airDate: "Unknown" },
+    expect(character.episodeSeasons).toEqual([
+      { season: 1, count: 2 },
+      { season: null, count: 1 },
     ]);
   });
 
-  it("handles a genuinely absent episode field without throwing (returnPartialData)", () => {
-    // `returnPartialData` can hand us a character whose `episode` field
-    // hasn't arrived from the network yet -- the mapper's input type
+  it("handles a genuinely absent episode summary without throwing (returnPartialData)", () => {
+    // `returnPartialData` can hand us a character whose episode fields
+    // haven't arrived from the network yet -- the mapper's input type
     // (DeepPartial) already reflects that as legitimately possible, no
     // cast needed to construct this fixture.
-    const { episode, ...partialCharacter } = buildApiCharacterDetail();
-    void episode; // intentionally discarded -- that's the point of this fixture
+    const { episodeCount, episodeSeasons, ...partialCharacter } =
+      buildApiCharacterDetail();
+    void episodeCount; // intentionally discarded -- that's the point of this fixture
+    void episodeSeasons;
 
     expect(() => mapCharacterDetail(partialCharacter)).not.toThrow();
-    expect(mapCharacterDetail(partialCharacter).episodes).toEqual([]);
+    const character = mapCharacterDetail(partialCharacter);
+    expect(character.episodeCount).toBe(0);
+    expect(character.episodeSeasons).toEqual([]);
   });
 });

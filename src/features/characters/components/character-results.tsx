@@ -111,7 +111,7 @@ export function CharacterResults({
             </p>
           )}
 
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
             {state === "loading"
               ? Array.from({ length: SKELETON_COUNT }).map((_, index) => (
                   <SkeletonCard key={index} />
@@ -120,6 +120,7 @@ export function CharacterResults({
                   <CharacterCard
                     key={character.id}
                     character={character}
+                    searchTerm={filters.name}
                     eagerImage={index === 0}
                   />
                 ))}

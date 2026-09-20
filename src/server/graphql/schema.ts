@@ -8,16 +8,21 @@ import {
   findSharedEpisodes,
   findSharedLocations,
   paginate,
+  selectCharacterEpisodesInSeason,
   selectCharactersWithUnknownOrigins,
   selectMostPopulatedLocations,
   selectMostSeenCharacters,
   sortCharacters,
+  summarizeCharacterEpisodeSeasons,
   type CharacterFilterInput,
   type CharacterSortField,
   type LocationFilterInput,
   type SortDirection,
 } from "./query-utils";
 import { createSearchRecovery } from "./search-recovery";
+
+/** Small chunks -- a season rarely has many episodes, but the point is that "load more" is real regardless. */
+const CHARACTER_EPISODES_PER_SEASON_PAGE_SIZE = 5;
 
 const toLocation = (location: {
   id: string;
@@ -154,6 +159,29 @@ export const resolvers = {
         const episode = episodesById.get(id);
         return episode ? [episode] : [];
       });
+    },
+    episodeSeasons: async (character: { episodeIds: string[] }) => {
+      const dataset = await getConnectedDataset();
+      return summarizeCharacterEpisodeSeasons(
+        character.episodeIds,
+        dataset.episodes,
+      );
+    },
+    episodesInSeason: async (
+      character: { episodeIds: string[] },
+      args: { season?: number | null; page?: number },
+    ) => {
+      const dataset = await getConnectedDataset();
+      const seasonEpisodes = selectCharacterEpisodesInSeason(
+        character.episodeIds,
+        args.season ?? null,
+        dataset.episodes,
+      );
+      return paginate(
+        seasonEpisodes,
+        args.page,
+        CHARACTER_EPISODES_PER_SEASON_PAGE_SIZE,
+      );
     },
   },
   Episode: {

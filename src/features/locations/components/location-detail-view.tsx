@@ -29,9 +29,9 @@ export function LocationDetailView({ id }: LocationDetailViewProps) {
 
       <Card className="overflow-hidden">
         <div className="space-y-4 p-6 sm:p-8">
-          <h2 className="text-display font-bold text-foreground">
+          <h1 className="text-display font-bold text-foreground">
             {location.name}
-          </h2>
+          </h1>
           <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-body">
             <Attribute label="Type" value={location.type} />
             <Attribute label="Dimension" value={location.dimension} />

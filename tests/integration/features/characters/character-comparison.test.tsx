@@ -45,17 +45,15 @@ function picksMock(name: string, matches: Array<{ id: string; name: string }>) {
   };
 }
 
-describe("CharacterComparison (integration: two-picker search + shared results)", () => {
+describe("CharacterComparison (integration: guided character selection + shared results)", () => {
   beforeEach(() => {
     __resetNavigationMock();
   });
 
   it("finds and selects a character per picker, then shows their shared episodes and locations", async () => {
     const user = userEvent.setup();
-    // CharacterPicker has no debounce -- it queries on every keystroke past
-    // one character (see character-comparison.tsx). fireEvent.change fires
-    // a single change with the final value instead of one query per
-    // keystroke, so only the query actually asserted on needs a mock.
+    // CharacterPicker searches after two characters. fireEvent.change sends
+    // the final term in one step, so only the asserted query needs a mock.
     const mocks = [
       picksMock("rick", [{ id: "1", name: "Rick Sanchez" }]),
       picksMock("morty", [{ id: "2", name: "Morty Smith" }]),
@@ -117,14 +115,14 @@ describe("CharacterComparison (integration: two-picker search + shared results)"
       target: { value: "rick" },
     });
     await user.click(
-      await screen.findByRole("button", { name: "Rick Sanchez" }),
+      await screen.findByRole("option", { name: /Rick Sanchez/ }),
     );
 
     fireEvent.change(screen.getByLabelText("Second character"), {
       target: { value: "morty" },
     });
     await user.click(
-      await screen.findByRole("button", { name: "Morty Smith" }),
+      await screen.findByRole("option", { name: /Morty Smith/ }),
     );
 
     expect(await screen.findByText("Pilot")).toBeInTheDocument();
@@ -133,6 +131,14 @@ describe("CharacterComparison (integration: two-picker search + shared results)"
     // shared-episode/location cards -- distinct sections of the page.
     expect(
       screen.getByRole("region", { name: "Selected characters" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", {
+        name: "View Rick Sanchez's character details",
+      }),
+    ).toHaveAttribute("href", "/characters/1");
+    expect(
+      screen.getByRole("img", { name: "Portrait of Rick Sanchez" }),
     ).toBeInTheDocument();
   });
 
@@ -205,12 +211,36 @@ describe("CharacterComparison (integration: two-picker search + shared results)"
     const input = screen.getByLabelText("First character");
     await user.type(input, "r");
     expect(
-      screen.queryByRole("button", { name: "Rick Sanchez" }),
+      screen.queryByRole("option", { name: /Rick Sanchez/ }),
     ).not.toBeInTheDocument();
 
     await user.type(input, "i");
     expect(
-      await screen.findByRole("button", { name: "Rick Sanchez" }),
+      await screen.findByRole("option", { name: /Rick Sanchez/ }),
     ).toBeInTheDocument();
+  });
+
+  it("supports keyboard selection and removing a selected character", async () => {
+    const user = userEvent.setup();
+    const mocks = [picksMock("ri", [{ id: "1", name: "Rick Sanchez" }])];
+
+    render(
+      <MockedProvider mocks={mocks}>
+        <CharacterComparison />
+      </MockedProvider>,
+    );
+
+    const input = screen.getByLabelText("First character");
+    await user.type(input, "ri");
+    await screen.findByRole("option", { name: /Rick Sanchez/ });
+    await user.keyboard("{Enter}");
+
+    expect(
+      screen.getByText(
+        "First character chosen. Now choose someone to compare them with.",
+      ),
+    ).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Remove" }));
+    expect(screen.getByText("Start with two characters.")).toBeInTheDocument();
   });
 });

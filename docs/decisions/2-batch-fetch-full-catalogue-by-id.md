@@ -1,4 +1,4 @@
-# 009. Load the full catalogue with batched id queries instead of paging
+# 2. Load the full catalogue with batched id queries instead of paging
 
 ## Status
 
@@ -6,7 +6,7 @@ Accepted
 
 ## Context
 
-[008](008-backend-for-frontend-with-cached-dataset.md) commits us to loading the entire catalogue once and caching it. The public API's normal query returns 20 items per page. Characters alone are 800+, so paging through it page by page means dozens of slow, sequential requests, and we'd still need a second pass to resolve the relationship ids (origin, location, episodes) that each page leaves out.
+[1](1-backend-for-frontend-with-cached-dataset.md) commits us to loading the entire catalogue once and caching it. The public API's normal query returns 20 items per page. Characters alone are 800+, so paging through it page by page means dozens of slow, sequential requests, and we'd still need a second pass to resolve the relationship ids (origin, location, episodes) that each page leaves out.
 
 ## Decision
 

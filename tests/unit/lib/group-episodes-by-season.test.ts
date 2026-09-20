@@ -1,14 +1,18 @@
 import { describe, expect, it } from "vitest";
-import type { CharacterEpisode } from "@/features/characters/domain/character-detail";
-import { groupCharacterEpisodesBySeason } from "@/features/characters/domain/group-character-episodes";
+import { groupEpisodesBySeason } from "@/lib/group-episodes-by-season";
 
-function episode(code: string, id = code): CharacterEpisode {
-  return { id, code, name: `Episode ${code}`, airDate: "December 2, 2013" };
+interface TestEpisode {
+  id: string;
+  code: string;
 }
 
-describe("groupCharacterEpisodesBySeason", () => {
+function episode(code: string, id = code): TestEpisode {
+  return { id, code };
+}
+
+describe("groupEpisodesBySeason", () => {
   it("sorts several seasons and their episodes in numeric order", () => {
-    const groups = groupCharacterEpisodesBySeason([
+    const groups = groupEpisodesBySeason([
       episode("S02E03"),
       episode("S01E02"),
       episode("S01E01"),
@@ -27,7 +31,7 @@ describe("groupCharacterEpisodesBySeason", () => {
   });
 
   it("keeps a single season in one group", () => {
-    const groups = groupCharacterEpisodesBySeason([
+    const groups = groupEpisodesBySeason([
       episode("S03E02"),
       episode("S03E01"),
     ]);
@@ -41,12 +45,27 @@ describe("groupCharacterEpisodesBySeason", () => {
   });
 
   it("places unexpected formats in an Other group after numbered seasons", () => {
-    const groups = groupCharacterEpisodesBySeason([
-      episode("TBA"),
-      episode("S01E01"),
-    ]);
+    const groups = groupEpisodesBySeason([episode("TBA"), episode("S01E01")]);
 
     expect(groups.map(({ label }) => label)).toEqual(["Season 1", "Other"]);
     expect(groups[1]?.episodes.map(({ code }) => code)).toEqual(["TBA"]);
+  });
+
+  it("preserves whatever extra fields the caller's type carries", () => {
+    interface FullEpisode extends TestEpisode {
+      name: string;
+      characterCount: number;
+    }
+
+    const groups = groupEpisodesBySeason<FullEpisode>([
+      { id: "1", code: "S01E01", name: "Pilot", characterCount: 4 },
+    ]);
+
+    expect(groups[0]?.episodes[0]).toEqual({
+      id: "1",
+      code: "S01E01",
+      name: "Pilot",
+      characterCount: 4,
+    });
   });
 });

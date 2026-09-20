@@ -2,6 +2,8 @@
 
 Browse, filter, and compare every character, location, and episode from Rick and Morty. Built with Next.js, TypeScript, Apollo GraphQL, and Tailwind.
 
+**Live demo:** [multiverse-explorer-black.vercel.app](https://multiverse-explorer-black.vercel.app/)
+
 ## What it does
 
 - Search and filter characters by status, species, gender, dimension, and episode count.
@@ -51,15 +53,19 @@ Open `http://localhost:3000`.
 
 ## How the app is put together
 
-The browser never calls the public Rick and Morty API directly. It calls a GraphQL endpoint that this app owns at `/api/graphql`. That endpoint loads the full catalogue from the upstream API, connects it in memory, and caches it for a day. This is a backend for frontend, and the reasoning behind it is written up in [docs/decisions/008](docs/decisions/008-backend-for-frontend-with-cached-dataset.md): the public API can only filter a few fields and returns one page at a time, so doing the real filtering and sorting on our own server gives the UI far more than the upstream API offers on its own.
+The browser never calls the public Rick and Morty API directly. It calls a GraphQL endpoint that this app owns at `/api/graphql`. That endpoint loads the full catalogue from the upstream API, connects it in memory, and caches it for a day. This is a backend for frontend, and the reasoning behind it is written up in [docs/decisions/1](docs/decisions/1-backend-for-frontend-with-cached-dataset.md): the public API can only filter a few fields and returns one page at a time, so doing the real filtering and sorting on our own server gives the UI far more than the upstream API offers on its own.
 
-Loading that full catalogue fast is its own problem. The upstream API returns 20 items per page, and there are over 800 characters, so paging through one page at a time would mean dozens of slow requests in a row. [docs/decisions/009](docs/decisions/009-batch-fetch-full-catalogue-by-id.md) explains the fix: fetch the total count first, then pull every record in parallel batches of 100 using the API's bulk id queries.
+Loading that full catalogue fast is its own problem. The upstream API returns 20 items per page, and there are over 800 characters, so paging through one page at a time would mean dozens of slow requests in a row. [docs/decisions/2](docs/decisions/2-batch-fetch-full-catalogue-by-id.md) explains the fix: fetch the total count first, then pull every record in parallel batches of 100 using the API's bulk id queries.
 
-Because the schema's types point back at each other (a character has a location, a location has residents, a resident has episodes, and so on), nothing stops a client from writing a query that walks that chain forever. [docs/decisions/010](docs/decisions/010-graphql-query-depth-limit.md) covers the fix: every incoming query is checked for how deeply it nests before it reaches a resolver, and anything past 8 levels is rejected outright.
+Because the schema's types point back at each other (a character has a location, a location has residents, a resident has episodes, and so on), nothing stops a client from writing a query that walks that chain forever. [docs/decisions/3](docs/decisions/3-graphql-query-depth-limit.md) covers the fix: every incoming query is checked for how deeply it nests before it reaches a resolver, and anything past 8 levels is rejected outright.
 
-Saved filters live entirely in the browser's local storage instead of on a server. [docs/decisions/011](docs/decisions/011-saved-filters-stay-in-the-browser.md) explains why: a server side version would need user accounts and a database, and this app deliberately has neither yet.
+Saved filters live entirely in the browser's local storage instead of on a server. [docs/decisions/4](docs/decisions/4-saved-filters-stay-in-the-browser.md) explains why: a server side version would need user accounts and a database, and this app deliberately has neither yet.
 
-A combined search across characters, locations, and episodes is proposed in [docs/decisions/012](docs/decisions/012-combined-search-without-llm-ranking.md), including why it is planned as a plain, deterministic query instead of one routed through an AI model. The full decision history, including the reasoning behind each choice, lives in [docs/decisions](docs/decisions).
+A combined search across characters, locations, and episodes is proposed in [docs/decisions/5](docs/decisions/5-combined-search-without-llm-ranking.md), including why it is planned as a plain, deterministic query instead of one routed through an AI model.
+
+When a character search comes back empty, the app doesn't just show a dead end: [docs/decisions/6](docs/decisions/6-deterministic-socratic-search-recovery.md) covers a recovery flow that asks a targeted follow-up question, built from the same deterministic filter data, and only ever offers an option once it already knows that option has real matches.
+
+The full decision history, including the reasoning behind each choice, lives in [docs/decisions](docs/decisions).
 
 The GraphQL API itself, its conventions, and example queries are documented in [docs/api.md](docs/api.md).
 
@@ -96,3 +102,5 @@ Tests are split into three layers on purpose, each catching a different kind of 
 - **End to end tests** run Playwright against a real production build talking to the real upstream API. This is the one layer that would catch a break in the actual data fetching path, which the other two layers mock away.
 
 Run all three with `npm run test` and `npm run test:e2e`.
+
+Developers are never fully happy with their own code, and that is part of the fun. 🙂

@@ -50,7 +50,7 @@ describe("EpisodeDetailView (integration: episode header + cast)", () => {
     );
 
     expect(
-      await screen.findByRole("heading", { level: 2, name: "Pilot" }),
+      await screen.findByRole("heading", { level: 1, name: "Pilot" }),
     ).toBeInTheDocument();
     expect(screen.getByText("S01E01")).toBeInTheDocument();
     expect(screen.getByText("December 2, 2013")).toBeInTheDocument();
@@ -72,7 +72,7 @@ describe("EpisodeDetailView (integration: episode header + cast)", () => {
       </MockedProvider>,
     );
 
-    await screen.findByRole("heading", { level: 2, name: "Pilot" });
+    await screen.findByRole("heading", { level: 1, name: "Pilot" });
     expect(
       screen.getByText("No character appearances on record."),
     ).toBeInTheDocument();
@@ -121,7 +121,7 @@ describe("EpisodeDetailView (integration: episode header + cast)", () => {
     await user.click(screen.getByRole("button", { name: "Retry" }));
 
     expect(
-      await screen.findByRole("heading", { level: 2, name: "Pilot" }),
+      await screen.findByRole("heading", { level: 1, name: "Pilot" }),
     ).toBeInTheDocument();
   });
 });
