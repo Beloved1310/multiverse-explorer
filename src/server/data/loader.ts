@@ -5,7 +5,6 @@ import { retryWithBackoff } from "@/lib/apollo/retry-condition";
 import { logError } from "@/lib/logger";
 import snapshot from "./snapshot.json";
 import { connectDataset } from "./connect";
-import { readSharedDataset, writeSharedDataset } from "./redis-cache";
 import type { ConnectedDataset, RawDataset } from "./types";
 
 const ENDPOINT =
@@ -174,18 +173,12 @@ async function loadLiveDataset(): Promise<RawDataset> {
 }
 
 async function loadConnectedDataset(): Promise<ConnectedDataset> {
-  const sharedDataset = await readSharedDataset();
-  if (sharedDataset) return sharedDataset;
-
-  let dataset: ConnectedDataset;
   try {
-    dataset = connectDataset(await loadLiveDataset());
+    return connectDataset(await loadLiveDataset());
   } catch (error) {
     logError("dataset_load_failed", { fallback: "snapshot" }, error);
-    dataset = connectDataset(snapshot);
+    return connectDataset(snapshot);
   }
-  await writeSharedDataset(dataset);
-  return dataset;
 }
 
 /** Cached for 24 hours. See Next.js: Functions: unstable_cache. */
