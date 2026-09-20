@@ -7,18 +7,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { StatusPanel } from "@/components/ui/status-panel";
-import {
-  AlertIcon,
-  CalendarIcon,
-  EmptyIcon,
-  SpinnerIcon,
-} from "@/components/ui/icons";
+import { AlertIcon, EmptyIcon, SpinnerIcon } from "@/components/ui/icons";
 import type {
   CharacterEpisode,
   CharacterLocationRef,
 } from "../domain/character-detail";
 import { STATUS_LABELS } from "../domain/character";
 import { useCharacterDetail } from "../hooks/use-character-detail";
+import { CharacterEpisodeList } from "./character-episode-list";
 
 // The domain model deliberately keeps gender lowercase (see
 // normalize-character-fields.ts); this is purely a display concern.
@@ -41,7 +37,7 @@ export function CharacterDetailView({ id }: CharacterDetailViewProps) {
 
   return (
     <div className="space-y-6">
-      <BackLink label="Back to the multiverse" />
+      <BackLink label="Back to characters" />
 
       <Card className="overflow-hidden">
         <div className="grid gap-6 p-6 sm:grid-cols-[16rem_1fr] sm:p-8">
@@ -133,10 +129,6 @@ function EpisodesSection({
 }) {
   return (
     <Card className="p-6 sm:p-8">
-      <h3 className="mb-4 text-heading font-semibold text-foreground">
-        Episode appearances
-      </h3>
-
       {episodes.length === 0 && stillLoading && (
         <p className="flex items-center gap-2 text-caption text-foreground-muted">
           <SpinnerIcon className="h-4 w-4 text-brand" />
@@ -150,36 +142,7 @@ function EpisodesSection({
         </p>
       )}
 
-      {episodes.length > 0 && (
-        <ul className="divide-y divide-border">
-          {episodes.map((episode, index) => (
-            <li
-              // The list this page was opened from only ever fetches
-              // `episode { name }` -- no id. During the brief window
-              // where `returnPartialData` is rendering that
-              // already-cached (id-less) data before the network
-              // response with real ids arrives, every episode's `id`
-              // would otherwise be "" simultaneously. Falling back to
-              // the index keeps keys unique through that transition.
-              key={episode.id || index}
-              className="flex flex-wrap items-center justify-between gap-2 py-3"
-            >
-              <div className="flex items-center gap-3">
-                <span className="rounded-control bg-brand-subtle px-2 py-1 text-caption font-semibold text-brand">
-                  {episode.code}
-                </span>
-                <span className="text-body text-foreground">
-                  {episode.name}
-                </span>
-              </div>
-              <span className="flex items-center gap-1.5 text-caption text-foreground-muted">
-                <CalendarIcon className="h-3.5 w-3.5" />
-                {episode.airDate}
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
+      {episodes.length > 0 && <CharacterEpisodeList episodes={episodes} />}
     </Card>
   );
 }
@@ -212,12 +175,12 @@ function DetailSkeleton() {
 function NotFoundState() {
   return (
     <div className="space-y-6">
-      <BackLink label="Back to the multiverse" />
+      <BackLink label="Back to characters" />
       <StatusPanel
         tone="brand"
         icon={<EmptyIcon className="h-6 w-6" />}
-        heading="This being doesn't exist in any reality we've found."
-        description="Double-check the link, or head back and search the multiverse."
+        heading="Character not found."
+        description="Check the link or return to the character list."
       />
     </div>
   );
@@ -226,12 +189,12 @@ function NotFoundState() {
 function ErrorState({ onRetry }: { onRetry: () => void }) {
   return (
     <div className="space-y-6">
-      <BackLink label="Back to the multiverse" />
+      <BackLink label="Back to characters" />
       <StatusPanel
         tone="danger"
         icon={<AlertIcon className="h-6 w-6" />}
-        heading="Something glitched in this dimension."
-        description="We couldn't reach the multiverse's database. Check your connection and try again."
+        heading="Could not load this character."
+        description="Check your connection and try again."
         action={<Button onClick={onRetry}>Retry</Button>}
       />
     </div>
