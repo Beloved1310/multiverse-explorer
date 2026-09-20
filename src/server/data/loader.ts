@@ -2,6 +2,7 @@ import "server-only";
 
 import { unstable_cache } from "next/cache";
 import { retryWithBackoff } from "@/lib/apollo/retry-condition";
+import { logError } from "@/lib/logger";
 import snapshot from "./snapshot.json";
 import { connectDataset } from "./connect";
 import type { ConnectedDataset, RawDataset } from "./types";
@@ -175,7 +176,7 @@ async function loadConnectedDataset(): Promise<ConnectedDataset> {
   try {
     return connectDataset(await loadLiveDataset());
   } catch (error) {
-    console.error("Falling back to the bundled API snapshot.", error);
+    logError("dataset_load_failed", { fallback: "snapshot" }, error);
     return connectDataset(snapshot);
   }
 }

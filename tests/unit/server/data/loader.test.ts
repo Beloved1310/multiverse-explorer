@@ -225,9 +225,15 @@ describe("loadConnectedDataset", () => {
     expect(dataset.locations.length).toBeGreaterThan(0);
     expect(dataset.episodes.length).toBeGreaterThan(0);
 
-    expect(errorSpy).toHaveBeenCalledWith(
-      "Falling back to the bundled API snapshot.",
-      expect.any(Error),
-    );
+    // Logged as one JSON line via logError (src/lib/logger.ts), not a
+    // plain console.error(message, error) pair.
+    expect(errorSpy).toHaveBeenCalledTimes(1);
+    const logged = JSON.parse(errorSpy.mock.calls[0]?.[0] as string);
+    expect(logged).toMatchObject({
+      level: "error",
+      event: "dataset_load_failed",
+      fallback: "snapshot",
+      error: { message: "Failed to fetch" },
+    });
   });
 });

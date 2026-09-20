@@ -1,6 +1,7 @@
 "use client";
 
-import { Component, type ReactNode } from "react";
+import { Component, type ErrorInfo, type ReactNode } from "react";
+import { logError } from "@/lib/logger";
 import { Button } from "./button";
 
 interface ErrorBoundaryProps {
@@ -27,10 +28,12 @@ export class ErrorBoundary extends Component<
     return { hasError: true };
   }
 
-  componentDidCatch(error: Error) {
-    if (process.env.NODE_ENV === "development") {
-      console.error("[ErrorBoundary]", error);
-    }
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    logError(
+      "render_crash",
+      { componentStack: errorInfo.componentStack },
+      error,
+    );
   }
 
   handleReset = () => {
