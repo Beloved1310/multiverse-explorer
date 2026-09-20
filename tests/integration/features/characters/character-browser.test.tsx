@@ -1,14 +1,18 @@
+import { InMemoryCache } from "@apollo/client";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MockedProvider } from "@apollo/client/testing/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { CharacterBrowser } from "@/features/characters/components/character-browser";
 import { GetCharactersQuery } from "@/features/characters/api/get-characters";
+import { characterCacheTypePolicies } from "@/features/characters/api/cache-policies";
 import {
   __resetNavigationMock,
   routerReplace,
 } from "../../test-utils/mock-next-navigation";
 import { buildCharactersResponse } from "../../test-utils/build-characters-response";
+
+const NAME_SORT = { field: "NAME" as const, direction: "ASC" as const };
 
 // This is what turns the URL-driven filter hook (useCharacterFilters) into
 // something testable at all: without a fake router that actually updates
@@ -163,5 +167,120 @@ describe("CharacterBrowser (integration: filter bar + results + GraphQL layer)",
 
     expect(routerReplace).toHaveBeenLastCalledWith("/", { scroll: false });
     await waitFor(() => expect(clearButton).toBeDisabled());
+  });
+
+  it("merges a second page onto the first via the real cache policy, then shows the edge of the list", async () => {
+    const user = userEvent.setup();
+    const mocks = [
+      {
+        request: {
+          query: GetCharactersQuery,
+          variables: { filter: undefined, page: 1, sort: NAME_SORT },
+        },
+        result: {
+          data: buildCharactersResponse([{ id: "1", name: "Rick Sanchez" }], {
+            next: 2,
+            count: 2,
+          }),
+        },
+      },
+      {
+        request: {
+          query: GetCharactersQuery,
+          variables: { filter: undefined, page: 2, sort: NAME_SORT },
+        },
+        result: {
+          data: buildCharactersResponse([{ id: "2", name: "Morty Smith" }], {
+            next: null,
+            count: 2,
+          }),
+        },
+      },
+    ];
+
+    render(
+      <MockedProvider
+        mocks={mocks}
+        cache={new InMemoryCache({ typePolicies: characterCacheTypePolicies })}
+      >
+        <CharacterBrowser />
+      </MockedProvider>,
+    );
+
+    await screen.findByText("Rick Sanchez");
+    await user.click(screen.getByRole("button", { name: "Load more" }));
+
+    // Both pages on screen at once -- a merge, not a replace. If
+    // mergeCharacters ever regressed to always returning `incoming`, page
+    // one would disappear the moment page two arrived.
+    expect(await screen.findByText("Morty Smith")).toBeInTheDocument();
+    expect(screen.getByText("Rick Sanchez")).toBeInTheDocument();
+    expect(
+      screen.getByText(/You.ve reached the edge of this reality\./),
+    ).toBeInTheDocument();
+  });
+
+  it("starts a fresh list on a new filter instead of appending onto an already-paginated one", async () => {
+    const user = userEvent.setup();
+    const mocks = [
+      {
+        request: {
+          query: GetCharactersQuery,
+          variables: { filter: undefined, page: 1, sort: NAME_SORT },
+        },
+        result: {
+          data: buildCharactersResponse([{ id: "1", name: "Rick Sanchez" }], {
+            next: 2,
+            count: 2,
+          }),
+        },
+      },
+      {
+        request: {
+          query: GetCharactersQuery,
+          variables: { filter: undefined, page: 2, sort: NAME_SORT },
+        },
+        result: {
+          data: buildCharactersResponse([{ id: "2", name: "Morty Smith" }], {
+            next: null,
+            count: 2,
+          }),
+        },
+      },
+      {
+        request: {
+          query: GetCharactersQuery,
+          variables: { filter: { name: "beth" }, page: 1, sort: NAME_SORT },
+        },
+        result: {
+          data: buildCharactersResponse([{ id: "3", name: "Beth Smith" }], {
+            next: null,
+            count: 1,
+          }),
+        },
+      },
+    ];
+
+    render(
+      <MockedProvider
+        mocks={mocks}
+        cache={new InMemoryCache({ typePolicies: characterCacheTypePolicies })}
+      >
+        <CharacterBrowser />
+      </MockedProvider>,
+    );
+
+    await screen.findByText("Rick Sanchez");
+    await user.click(screen.getByRole("button", { name: "Load more" }));
+    await screen.findByText("Morty Smith");
+
+    await user.type(screen.getByPlaceholderText("Search characters…"), "beth");
+
+    // If `keyArgs` ever grew to include `page`, or the merge stopped
+    // resetting on page 1, this would show three characters instead of
+    // the new filter's own single result.
+    expect(await screen.findByText("Beth Smith")).toBeInTheDocument();
+    expect(screen.queryByText("Rick Sanchez")).not.toBeInTheDocument();
+    expect(screen.queryByText("Morty Smith")).not.toBeInTheDocument();
   });
 });
