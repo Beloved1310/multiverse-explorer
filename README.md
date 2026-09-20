@@ -8,7 +8,8 @@ Browse, filter, and compare every character, location, and episode from Rick and
 - Browse locations and episodes with the same kind of filters.
 - Compare two characters and see what they share: episodes and locations.
 - See curated collections on the home page: most seen characters, characters with unknown origins, most populated locations.
-- Save a filter combination in the browser and use it again later.
+- Create an account and save filter combinations across devices.
+- Get a verified next suggestion instead of a dead end when a character search comes back empty.
 
 ## Tech stack
 
@@ -18,6 +19,8 @@ Browse, filter, and compare every character, location, and episode from Rick and
 - GraphQL Codegen for typed queries.
 - Tailwind CSS for styling.
 - Vitest for unit and integration tests, Playwright for end to end tests.
+- Docker Compose for a local application and PostgreSQL stack.
+- Better Auth, Drizzle, and PostgreSQL for account-backed saved filters.
 
 ## Getting started
 
@@ -33,6 +36,12 @@ Open `http://localhost:3000`.
 
 `.env.local` needs one value: the upstream GraphQL endpoint the server loads data from. The default in `.env.example` points at the public Rick and Morty API. The browser never talks to that endpoint directly, it only talks to this app's own API at `/api/graphql`. See [docs/api.md](docs/api.md) for why.
 
+For a containerised local stack, run `docker compose up --build`. It starts the
+application and a persistent PostgreSQL service. PostgreSQL is provisioned for
+the planned authenticated saved-filter feature; the catalogue still uses the
+cached BFF. See [docs/deployment.md](docs/deployment.md) for local commands and
+production deployment guidance.
+
 ## Scripts
 
 | Command                    | What it does                                                |
@@ -43,6 +52,8 @@ Open `http://localhost:3000`.
 | `npm run lint`             | Check code style with ESLint.                               |
 | `npm run typecheck`        | Check types with TypeScript, no build output.               |
 | `npm run codegen`          | Regenerate typed GraphQL client code after a schema change. |
+| `npm run db:generate`      | Generate a Drizzle migration after a schema change.         |
+| `npm run db:migrate`       | Apply checked-in Drizzle migrations.                        |
 | `npm run test`             | Run unit and integration tests once.                        |
 | `npm run test:unit`        | Run only unit tests.                                        |
 | `npm run test:integration` | Run only integration tests.                                 |
@@ -57,9 +68,13 @@ Loading that full catalogue fast is its own problem. The upstream API returns 20
 
 Because the schema's types point back at each other (a character has a location, a location has residents, a resident has episodes, and so on), nothing stops a client from writing a query that walks that chain forever. [docs/decisions/010](docs/decisions/010-graphql-query-depth-limit.md) covers the fix: every incoming query is checked for how deeply it nests before it reaches a resolver, and anything past 8 levels is rejected outright.
 
-Saved filters live entirely in the browser's local storage instead of on a server. [docs/decisions/011](docs/decisions/011-saved-filters-stay-in-the-browser.md) explains why: a server side version would need user accounts and a database, and this app deliberately has neither yet.
+Saved filters are private, account-backed preferences. [docs/decisions/011](docs/decisions/011-saved-filters-stay-in-the-browser.md) explains why browser storage was right for the anonymous first release. [docs/decisions/014](docs/decisions/014-server-backed-saved-character-filters.md) explains the implemented Better Auth email/password, Drizzle, and PostgreSQL solution. A one-time import preserves an existing browser-only filter before that old data is removed.
 
-A combined search across characters, locations, and episodes is proposed in [docs/decisions/012](docs/decisions/012-combined-search-without-llm-ranking.md), including why it is planned as a plain, deterministic query instead of one routed through an AI model. The full decision history, including the reasoning behind each choice, lives in [docs/decisions](docs/decisions).
+A combined search across characters, locations, and episodes is proposed in [docs/decisions/012](docs/decisions/012-combined-search-without-llm-ranking.md), including why it is planned as a plain, deterministic query instead of one routed through an AI model.
+
+When a character search comes back empty, the app doesn't just show a dead end. [docs/decisions/013](docs/decisions/013-deterministic-socratic-search-recovery.md) explains how the server works out which single remembered detail to relax, checks the matches that produces, and only ever offers back verified, non-empty alternatives with their result counts. Name suggestions use deterministic edit distance, not a language model.
+
+The full decision history, including the reasoning behind each choice, lives in [docs/decisions](docs/decisions).
 
 The GraphQL API itself, its conventions, and example queries are documented in [docs/api.md](docs/api.md).
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ChevronDownIcon, SearchIcon } from "@/components/ui/icons";
@@ -27,8 +28,14 @@ interface CharacterFilterBarProps {
   onClearFilters: () => void;
   activeFilterCount: number;
   savedFilters: SavedCharacterFilter[];
-  onSaveFilter: (name: string, filters: CharacterFilters) => boolean;
-  onDeleteSavedFilter: (id: string) => void;
+  isSignedIn: boolean;
+  isLoading: boolean;
+  onSaveFilter: (name: string, filters: CharacterFilters) => Promise<boolean>;
+  onDeleteSavedFilter: (id: string) => Promise<void>;
+  legacyFilterCount: number;
+  importLegacyFilters: () => Promise<void>;
+  importing: boolean;
+  error: string | null;
 }
 
 export function CharacterFilterBar({
@@ -37,8 +44,14 @@ export function CharacterFilterBar({
   onClearFilters,
   activeFilterCount,
   savedFilters,
+  isSignedIn,
+  isLoading,
   onSaveFilter,
   onDeleteSavedFilter,
+  legacyFilterCount,
+  importLegacyFilters,
+  importing,
+  error,
 }: CharacterFilterBarProps) {
   const [nameInput, setNameInput] = useSyncedInput(filters.name);
   const debouncedName = useDebouncedValue(nameInput, DEBOUNCE_MS);
@@ -56,8 +69,8 @@ export function CharacterFilterBar({
     onFiltersChange({ name: debouncedName });
   }, [debouncedName, onFiltersChange]);
 
-  const saveCurrentFilter = () => {
-    if (onSaveFilter(savedName, filters)) setSavedName("");
+  const saveCurrentFilter = async () => {
+    if (await onSaveFilter(savedName, filters)) setSavedName("");
   };
 
   const copyShareLink = async () => {
@@ -265,62 +278,100 @@ export function CharacterFilterBar({
       </div>
 
       <div className="flex flex-col gap-3 border-t border-border pt-3">
-        <div className="flex flex-wrap items-end gap-2">
-          <div className="min-w-44 flex-1">
-            <label htmlFor="saved-filter-name" className="sr-only">
-              Saved search name
-            </label>
-            <input
-              id="saved-filter-name"
-              value={savedName}
-              onChange={(event) => setSavedName(event.target.value)}
-              placeholder="Name this search"
-              className={SELECT_CLASSES}
-            />
-          </div>
-          <Button
-            variant="secondary"
-            onClick={saveCurrentFilter}
-            disabled={activeFilterCount === 0 || !savedName.trim()}
-          >
-            Save search
-          </Button>
-          <Button variant="secondary" onClick={() => void copyShareLink()}>
-            Copy link
-          </Button>
-          <span
-            className="min-h-5 text-caption text-foreground-muted"
-            aria-live="polite"
-          >
-            {shareMessage}
-          </span>
-        </div>
-
-        {savedFilters.length > 0 && (
-          <div aria-label="Saved searches" className="flex flex-wrap gap-2">
-            {savedFilters.map((savedFilter) => (
-              <div
-                key={savedFilter.id}
-                className="inline-flex overflow-hidden rounded-control border border-border"
-              >
-                <button
-                  type="button"
-                  onClick={() => onFiltersChange(savedFilter.filters)}
-                  className="px-3 py-1.5 text-caption font-medium text-foreground hover:bg-surface-elevated focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
-                >
-                  {savedFilter.name}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onDeleteSavedFilter(savedFilter.id)}
-                  aria-label={`Delete saved search ${savedFilter.name}`}
-                  className="border-l border-border px-2 text-caption text-foreground-muted hover:bg-surface-elevated hover:text-foreground focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
-                >
-                  ×
-                </button>
+        {!isSignedIn ? (
+          <p className="text-caption text-foreground-muted">
+            <Link
+              href="/sign-in?next=/characters"
+              className="font-medium text-brand underline-offset-4 hover:underline"
+            >
+              Sign in
+            </Link>{" "}
+            to save searches and use them on any device.
+          </p>
+        ) : (
+          <>
+            <div className="flex flex-wrap items-end gap-2">
+              <div className="min-w-44 flex-1">
+                <label htmlFor="saved-filter-name" className="sr-only">
+                  Saved search name
+                </label>
+                <input
+                  id="saved-filter-name"
+                  value={savedName}
+                  onChange={(event) => setSavedName(event.target.value)}
+                  placeholder="Name this search"
+                  className={SELECT_CLASSES}
+                />
               </div>
-            ))}
-          </div>
+              <Button
+                variant="secondary"
+                onClick={() => void saveCurrentFilter()}
+                disabled={
+                  isLoading || activeFilterCount === 0 || !savedName.trim()
+                }
+              >
+                Save search
+              </Button>
+              <Button variant="secondary" onClick={() => void copyShareLink()}>
+                Copy link
+              </Button>
+              <span
+                className="min-h-5 text-caption text-foreground-muted"
+                aria-live="polite"
+              >
+                {shareMessage}
+              </span>
+            </div>
+
+            {legacyFilterCount > 0 && (
+              <div className="flex flex-wrap items-center gap-2 rounded-control bg-brand-subtle p-2.5 text-caption text-foreground">
+                <span>
+                  Import {legacyFilterCount} saved search
+                  {legacyFilterCount === 1 ? "" : "es"} from this browser.
+                </span>
+                <Button
+                  variant="secondary"
+                  onClick={() => void importLegacyFilters()}
+                  disabled={importing}
+                >
+                  {importing ? "Importing…" : "Import searches"}
+                </Button>
+              </div>
+            )}
+
+            {error && (
+              <p role="alert" className="text-status-dead text-caption">
+                {error}
+              </p>
+            )}
+
+            {savedFilters.length > 0 && (
+              <div aria-label="Saved searches" className="flex flex-wrap gap-2">
+                {savedFilters.map((savedFilter) => (
+                  <div
+                    key={savedFilter.id}
+                    className="inline-flex overflow-hidden rounded-control border border-border"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => onFiltersChange(savedFilter.filters)}
+                      className="px-3 py-1.5 text-caption font-medium text-foreground hover:bg-surface-elevated focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
+                    >
+                      {savedFilter.name}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void onDeleteSavedFilter(savedFilter.id)}
+                      aria-label={`Delete saved search ${savedFilter.name}`}
+                      className="border-l border-border px-2 text-caption text-foreground-muted hover:bg-surface-elevated hover:text-foreground focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
         )}
       </div>
     </Card>

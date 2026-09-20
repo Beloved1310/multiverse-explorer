@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { CloseIcon, MenuIcon } from "@/components/ui/icons";
+import { authClient } from "@/lib/auth-client";
 
 const NAV_ITEMS = [
   { href: "/characters", label: "Characters" },
@@ -47,6 +48,14 @@ function NavLinks({ onNavigate, linkClassName = "" }: NavLinksProps) {
 export function SiteHeader() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+  const session = authClient.useSession();
+
+  const signOut = async () => {
+    await authClient.signOut();
+    router.push("/");
+    router.refresh();
+  };
 
   // The landing page is intentionally a quiet, logo-led welcome. Navigation
   // begins once a visitor enters an explorer view.
@@ -72,6 +81,30 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex-1" />
+
+        <div className="hidden items-center gap-3 sm:flex">
+          {session.data?.user ? (
+            <>
+              <span className="max-w-32 truncate text-caption text-foreground-muted">
+                {session.data.user.name}
+              </span>
+              <button
+                type="button"
+                onClick={() => void signOut()}
+                className="text-caption font-medium text-foreground-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
+              >
+                Sign out
+              </button>
+            </>
+          ) : (
+            <Link
+              href="/sign-in"
+              className="text-caption font-medium text-foreground-muted hover:text-foreground"
+            >
+              Sign in
+            </Link>
+          )}
+        </div>
 
         <button
           type="button"

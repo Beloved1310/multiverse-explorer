@@ -2,19 +2,16 @@
 
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { CalendarIcon } from "@/components/ui/icons";
+import { groupEpisodesBySeason } from "@/lib/group-episodes-by-season";
 import { pluralize } from "@/lib/pluralize";
 import type { CharacterEpisode } from "../domain/character-detail";
-import { groupCharacterEpisodesBySeason } from "../domain/group-character-episodes";
 
 interface CharacterEpisodeListProps {
   episodes: CharacterEpisode[];
 }
 
 export function CharacterEpisodeList({ episodes }: CharacterEpisodeListProps) {
-  const groups = useMemo(
-    () => groupCharacterEpisodesBySeason(episodes),
-    [episodes],
-  );
+  const groups = useMemo(() => groupEpisodesBySeason(episodes), [episodes]);
   const groupSignature = groups.map((group) => group.key).join("|");
   const initialGroup = groups[0]?.key;
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(() =>

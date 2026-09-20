@@ -1,8 +1,9 @@
 export const typeDefs = `
   """
-  Read-only BFF over an in-memory, connected snapshot of the Rick and Morty
-  catalogue. See docs/api.md for an overview and example queries. Query
-  depth is capped (see depth-limit.ts).
+  BFF over an in-memory, connected snapshot of the Rick and Morty catalogue.
+  Public catalogue queries are read-only. Account-scoped saved filters require
+  an authenticated session. See docs/api.md for an overview and example
+  queries. Query depth is capped (see depth-limit.ts).
   """
   type Query {
     "Paged, filterable, sortable character search."
@@ -25,6 +26,17 @@ export const typeDefs = `
     compareCharacters(firstId: ID!, secondId: ID!): CharacterComparison
     "Returns one useful next question when a character search has no matches."
     searchRecovery(input: SearchRecoveryInput!): SearchRecovery
+    "The current person's private saved character searches."
+    savedCharacterFilters: [SavedCharacterFilter!]!
+  }
+
+  type Mutation {
+    "Creates a private saved character search for the signed-in person."
+    createSavedCharacterFilter(input: SaveCharacterFilterInput!): SavedCharacterFilter!
+    "Imports local-only filters once. Existing names are retained without duplication."
+    importSavedCharacterFilters(inputs: [SaveCharacterFilterInput!]!): [SavedCharacterFilter!]!
+    "Deletes a private saved search. Returns false when it is not owned by the signed-in person."
+    deleteSavedCharacterFilter(id: ID!): Boolean!
   }
 
   "Rick and Morty API-style pagination info for the current page."
@@ -72,6 +84,22 @@ export const typeDefs = `
     count: Int!
     filter: RecoveryCharacterFilter!
   }
+
+  type SavedCharacterFilter {
+    id: ID!
+    name: String!
+    filter: SavedCharacterFilterValue!
+  }
+  type SavedCharacterFilterValue {
+    name: String!
+    statuses: [String!]!
+    species: String!
+    gender: String!
+    dimension: String!
+    minEpisodes: Int
+    sort: SavedCharacterFilterSort!
+  }
+  type SavedCharacterFilterSort { field: CharacterSortField!, direction: SortDirection! }
   type RecoveryCharacterFilter {
     name: String
     statuses: [String!]!
@@ -126,6 +154,19 @@ export const typeDefs = `
     gender: String
     dimension: String
     minEpisodes: Int
+  }
+  input SaveCharacterFilterInput {
+    name: String!
+    filter: SavedCharacterFilterInput!
+  }
+  input SavedCharacterFilterInput {
+    name: String
+    statuses: [String!]
+    species: String
+    gender: String
+    dimension: String
+    minEpisodes: Int
+    sort: CharacterSort
   }
   input LocationFilter { name: String, type: String, dimension: String }
   input EpisodeFilter {

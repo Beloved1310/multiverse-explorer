@@ -8,7 +8,7 @@ import { CharacterResults } from "./character-results";
 export function CharacterBrowser() {
   const { filters, setFilters, clearFilters, activeFilterCount } =
     useCharacterFilters();
-  const { savedFilters, saveFilter, deleteFilter } = useSavedCharacterFilters();
+  const savedFiltersState = useSavedCharacterFilters();
 
   return (
     <div className="flex flex-col gap-6">
@@ -23,9 +23,15 @@ export function CharacterBrowser() {
         onFiltersChange={setFilters}
         onClearFilters={clearFilters}
         activeFilterCount={activeFilterCount}
-        savedFilters={savedFilters}
-        onSaveFilter={saveFilter}
-        onDeleteSavedFilter={deleteFilter}
+        savedFilters={savedFiltersState.savedFilters}
+        isSignedIn={savedFiltersState.isSignedIn}
+        isLoading={savedFiltersState.isLoading}
+        onSaveFilter={savedFiltersState.saveFilter}
+        onDeleteSavedFilter={savedFiltersState.deleteFilter}
+        legacyFilterCount={savedFiltersState.legacyFilterCount}
+        importLegacyFilters={savedFiltersState.importLegacyFilters}
+        importing={savedFiltersState.importing}
+        error={savedFiltersState.error}
       />
       <CharacterResults
         filters={filters}

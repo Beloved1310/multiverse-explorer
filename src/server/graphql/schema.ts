@@ -1,6 +1,17 @@
 import "server-only";
 
+import { GraphQLError } from "graphql";
 import { getConnectedDataset } from "@/server/data/loader";
+import type { GraphQLContext } from "@/server/graphql/context";
+import {
+  createSavedFilter,
+  deleteSavedFilter,
+  importSavedFilters,
+  listSavedFilters,
+  SavedFilterLimitError,
+  SavedFilterValidationError,
+  type SavedFilterInput,
+} from "@/server/saved-filters/service";
 import {
   clampCollectionLimit,
   filterCharacters,
@@ -32,6 +43,29 @@ const toLocation = (location: {
 
 function includesText(value: string, query?: string | null) {
   return !query || value.toLowerCase().includes(query.trim().toLowerCase());
+}
+
+function requireUserId(context: GraphQLContext) {
+  if (!context.userId) {
+    throw new GraphQLError("Sign in to manage saved searches.", {
+      extensions: { code: "UNAUTHENTICATED" },
+    });
+  }
+  return context.userId;
+}
+
+function savedFilterError(error: unknown): never {
+  if (error instanceof SavedFilterValidationError) {
+    throw new GraphQLError(error.message, {
+      extensions: { code: "BAD_USER_INPUT" },
+    });
+  }
+  if (error instanceof SavedFilterLimitError) {
+    throw new GraphQLError(error.message, {
+      extensions: { code: "SAVED_FILTER_LIMIT" },
+    });
+  }
+  throw error;
 }
 
 export const resolvers = {
@@ -138,6 +172,40 @@ export const resolvers = {
       const dataset = await getConnectedDataset();
       return createSearchRecovery(dataset.characters, args.input);
     },
+    savedCharacterFilters: async (
+      _: unknown,
+      __: unknown,
+      context: GraphQLContext,
+    ) => listSavedFilters(requireUserId(context)),
+  },
+  Mutation: {
+    createSavedCharacterFilter: async (
+      _: unknown,
+      args: { input: SavedFilterInput },
+      context: GraphQLContext,
+    ) => {
+      try {
+        return await createSavedFilter(requireUserId(context), args.input);
+      } catch (error) {
+        return savedFilterError(error);
+      }
+    },
+    importSavedCharacterFilters: async (
+      _: unknown,
+      args: { inputs: SavedFilterInput[] },
+      context: GraphQLContext,
+    ) => {
+      try {
+        return await importSavedFilters(requireUserId(context), args.inputs);
+      } catch (error) {
+        return savedFilterError(error);
+      }
+    },
+    deleteSavedCharacterFilter: (
+      _: unknown,
+      args: { id: string },
+      context: GraphQLContext,
+    ) => deleteSavedFilter(requireUserId(context), args.id),
   },
   Character: {
     origin: (character: { origin: Parameters<typeof toLocation>[0] | null }) =>
