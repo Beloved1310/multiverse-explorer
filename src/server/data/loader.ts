@@ -187,4 +187,4 @@ export const getConnectedDataset = unstable_cache(
   { revalidate: ONE_DAY, tags: ["multiverse-bff-dataset"] },
 );
 
-export { connectDataset, loadLiveDataset };
+export { connectDataset, loadLiveDataset, loadConnectedDataset };
