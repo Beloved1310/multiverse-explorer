@@ -8,13 +8,15 @@ import {
   SpinnerIcon,
 } from "@/components/ui/icons";
 import { SkeletonCard } from "@/components/ui/skeleton-card";
+import { StatusPanel } from "@/components/ui/status-panel";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { classifyResultState } from "@/lib/classify-result-state";
+import { formatNumber } from "@/lib/format";
 import type { CharacterFilters } from "../filters/character-filters";
 import { useCharacters } from "../hooks/use-characters";
 import { CharacterCard } from "./character-card";
 
-const SKELETON_COUNT = 8;
+const SKELETON_COUNT = 9;
 
 interface CharacterResultsProps {
   filters: CharacterFilters;
@@ -64,40 +66,27 @@ export function CharacterResults({
       </p>
 
       {state === "error" && (
-        <div className="flex flex-col items-center gap-4 py-16 text-center">
-          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-status-dead-bg text-status-dead-fg">
-            <AlertIcon className="h-6 w-6" />
-          </span>
-          <div className="space-y-1">
-            <p className="text-body font-medium text-foreground">
-              Something glitched in this dimension.
-            </p>
-            <p className="text-caption text-foreground-muted">
-              We couldn&apos;t reach the multiverse&apos;s database. Check your
-              connection and try again.
-            </p>
-          </div>
-          <Button onClick={refetch}>Retry</Button>
-        </div>
+        <StatusPanel
+          tone="danger"
+          icon={<AlertIcon className="h-6 w-6" />}
+          heading="Something glitched in this dimension."
+          description="We couldn't reach the multiverse's database. Check your connection and try again."
+          action={<Button onClick={refetch}>Retry</Button>}
+        />
       )}
 
       {state === "empty" && (
-        <div className="flex flex-col items-center gap-4 py-16 text-center">
-          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-subtle text-brand">
-            <EmptyIcon className="h-6 w-6" />
-          </span>
-          <div className="space-y-1">
-            <p className="text-body font-medium text-foreground">
-              No one matches that search.
-            </p>
-            <p className="text-caption text-foreground-muted">
-              Try a different name, or clear your filters to see everyone.
-            </p>
-          </div>
-          <Button variant="secondary" onClick={onClearFilters}>
-            Clear filters
-          </Button>
-        </div>
+        <StatusPanel
+          tone="brand"
+          icon={<EmptyIcon className="h-6 w-6" />}
+          heading="No one matches that search."
+          description="Try a different name, or clear your filters to see everyone."
+          action={
+            <Button variant="secondary" onClick={onClearFilters}>
+              Clear filters
+            </Button>
+          }
+        />
       )}
 
       {(state === "loading" || state === "success") && (
@@ -106,15 +95,17 @@ export function CharacterResults({
             <p className="mb-4 text-caption text-foreground-muted">
               Showing{" "}
               <span className="font-medium text-foreground">
-                {characters.length}
+                {formatNumber(characters.length)}
               </span>{" "}
               of{" "}
-              <span className="font-medium text-foreground">{totalCount}</span>{" "}
+              <span className="font-medium text-foreground">
+                {formatNumber(totalCount)}
+              </span>{" "}
               beings
             </p>
           )}
 
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {state === "loading"
               ? Array.from({ length: SKELETON_COUNT }).map((_, index) => (
                   <SkeletonCard key={index} />

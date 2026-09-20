@@ -10,6 +10,12 @@ export function CharacterBrowser() {
 
   return (
     <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-2">
+        <h1 className="text-display font-bold text-foreground">Characters</h1>
+        <p className="text-body text-foreground-muted">
+          Every being, every reality &mdash; search and filter the multiverse.
+        </p>
+      </div>
       <CharacterFilterBar
         filters={filters}
         onFiltersChange={setFilters}
