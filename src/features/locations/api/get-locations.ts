@@ -1,7 +1,7 @@
 import { graphql } from "@/lib/graphql/generated";
 
 export const GetLocationsQuery = graphql(`
-  query GetLocations($filter: FilterLocation, $page: Int) {
+  query GetLocations($filter: LocationFilter, $page: Int) {
     locations(filter: $filter, page: $page) {
       info {
         next

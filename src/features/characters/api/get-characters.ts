@@ -1,8 +1,12 @@
 import { graphql } from "@/lib/graphql/generated";
 
 export const GetCharactersQuery = graphql(`
-  query GetCharacters($filter: FilterCharacter, $page: Int) {
-    characters(filter: $filter, page: $page) {
+  query GetCharacters(
+    $filter: CharacterFilter
+    $page: Int
+    $sort: CharacterSort
+  ) {
+    characters(filter: $filter, page: $page, sort: $sort) {
       info {
         next
         count

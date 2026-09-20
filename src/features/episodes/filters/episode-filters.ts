@@ -1,4 +1,4 @@
-import type { FilterEpisode } from "@/lib/graphql/generated/graphql";
+import type { EpisodeFilter } from "@/lib/graphql/generated/graphql";
 
 export interface EpisodeFilters {
   name: string;
@@ -32,8 +32,8 @@ export function buildEpisodeFiltersSearchParams(
 /** Maps our URL-shaped filters to the GraphQL filter input, omitting empty fields. */
 export function toGraphQLEpisodeFilter(
   filters: EpisodeFilters,
-): FilterEpisode | undefined {
-  const filter: FilterEpisode = {};
+): EpisodeFilter | undefined {
+  const filter: EpisodeFilter = {};
   if (filters.name) filter.name = filters.name;
   if (filters.code) filter.episode = filters.code;
   return Object.keys(filter).length > 0 ? filter : undefined;

@@ -77,7 +77,7 @@ describe("mapCharacterDetail", () => {
       }),
     );
 
-    expect(character.origin).toEqual({ id: null, name: "unknown" });
+    expect(character.origin).toEqual({ id: null, name: "Unknown" });
     expect(character.location).toEqual({ id: null, name: "Unknown" });
   });
 

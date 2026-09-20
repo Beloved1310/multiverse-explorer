@@ -1,4 +1,4 @@
-import type { FilterLocation } from "@/lib/graphql/generated/graphql";
+import type { LocationFilter } from "@/lib/graphql/generated/graphql";
 
 export interface LocationFilters {
   name: string;
@@ -36,8 +36,8 @@ export function buildLocationFiltersSearchParams(
 /** Maps our URL-shaped filters to the GraphQL filter input, omitting empty fields. */
 export function toGraphQLLocationFilter(
   filters: LocationFilters,
-): FilterLocation | undefined {
-  const filter: FilterLocation = {};
+): LocationFilter | undefined {
+  const filter: LocationFilter = {};
   if (filters.name) filter.name = filters.name;
   if (filters.type) filter.type = filters.type;
   if (filters.dimension) filter.dimension = filters.dimension;

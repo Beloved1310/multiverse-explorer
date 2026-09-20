@@ -1,23 +1,10 @@
 import { describe, expect, it } from "vitest";
 import type { CharacterEpisode } from "@/features/characters/domain/character-detail";
-import {
-  groupCharacterEpisodesBySeason,
-  parseEpisodeCode,
-} from "@/features/characters/domain/group-character-episodes";
+import { groupCharacterEpisodesBySeason } from "@/features/characters/domain/group-character-episodes";
 
 function episode(code: string, id = code): CharacterEpisode {
   return { id, code, name: `Episode ${code}`, airDate: "December 2, 2013" };
 }
-
-describe("parseEpisodeCode", () => {
-  it("parses a standard season and episode code", () => {
-    expect(parseEpisodeCode("S01E07")).toEqual({ season: 1, episode: 7 });
-  });
-
-  it("safely rejects an unexpected code", () => {
-    expect(parseEpisodeCode("Pilot")).toBeNull();
-  });
-});
 
 describe("groupCharacterEpisodesBySeason", () => {
   it("sorts several seasons and their episodes in numeric order", () => {

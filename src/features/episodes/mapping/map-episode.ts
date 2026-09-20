@@ -6,14 +6,15 @@ export type ApiEpisode = NonNullable<
   NonNullable<NonNullable<GetEpisodesQuery["episodes"]>["results"]>[number]
 >;
 
-export function mapEpisode(apiEpisode: ApiEpisode): Episode {
+export function mapEpisode(apiEpisode: DeepPartial<ApiEpisode>): Episode {
   return {
     id: apiEpisode.id ?? "",
     name: normalizeText(apiEpisode.name),
     code: normalizeText(apiEpisode.episode),
     airDate: normalizeText(apiEpisode.air_date),
-    characterCount: apiEpisode.characters.filter(
+    characterCount: (apiEpisode.characters ?? []).filter(
       (character) => character !== null,
     ).length,
   };
 }
+import type { DeepPartial } from "@apollo/client/utilities";

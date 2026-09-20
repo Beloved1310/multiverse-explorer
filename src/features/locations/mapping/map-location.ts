@@ -12,7 +12,8 @@ export function mapLocation(apiLocation: ApiLocation): Location {
     name: normalizeText(apiLocation.name),
     type: normalizeText(apiLocation.type),
     dimension: normalizeText(apiLocation.dimension),
-    residentCount: apiLocation.residents.filter((resident) => resident !== null)
-      .length,
+    residentCount: (apiLocation.residents ?? []).filter(
+      (resident) => resident !== null,
+    ).length,
   };
 }

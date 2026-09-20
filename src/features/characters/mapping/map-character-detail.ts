@@ -13,7 +13,9 @@ import {
 
 type FullApiCharacterDetail = NonNullable<GetCharacterQuery["character"]>;
 type FullApiLocationRef = NonNullable<FullApiCharacterDetail["origin"]>;
-type FullApiEpisode = NonNullable<FullApiCharacterDetail["episode"][number]>;
+type FullApiEpisode = NonNullable<
+  NonNullable<FullApiCharacterDetail["episode"]>[number]
+>;
 
 /**
  * `returnPartialData` (used so name/image can render before episodes
