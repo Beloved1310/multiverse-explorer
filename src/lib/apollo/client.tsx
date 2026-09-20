@@ -15,9 +15,9 @@ import { episodeCacheTypePolicies } from "@/features/episodes/api/cache-policies
 import { locationCacheTypePolicies } from "@/features/locations/api/cache-policies";
 import { isRetryableNetworkError } from "./retry-condition";
 
-const GRAPHQL_ENDPOINT =
-  process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT ??
-  "https://rickandmortyapi.com/graphql";
+// Browser requests must always pass through the BFF. The upstream public API
+// is intentionally a server-only concern, configured in the data loader.
+const GRAPHQL_ENDPOINT = "/api/graphql";
 
 const errorLink = new ErrorLink(({ error, operation }) => {
   if (process.env.NODE_ENV !== "development") return;
