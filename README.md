@@ -103,4 +103,4 @@ Tests are split into three layers on purpose, each catching a different kind of 
 
 Run all three with `npm run test` and `npm run test:e2e`.
 
-Developers are never fully happy with their own code, and that is part of the fun. 🙂
+Developers are never fully happy with their own code, and that is part of the fun. See [docs/next-steps.md](docs/next-steps.md) for what's next, and [docs/ai-workflow-notes.md](docs/ai-workflow-notes.md) for how AI was used while building this. 🙂
