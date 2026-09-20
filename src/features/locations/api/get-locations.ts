@@ -1,8 +1,12 @@
 import { graphql } from "@/lib/graphql/generated";
 
 export const GetLocationsQuery = graphql(`
-  query GetLocations {
-    locations {
+  query GetLocations($filter: FilterLocation, $page: Int) {
+    locations(filter: $filter, page: $page) {
+      info {
+        next
+        count
+      }
       results {
         id
         name
@@ -10,7 +14,6 @@ export const GetLocationsQuery = graphql(`
         dimension
         residents {
           id
-          name
         }
       }
     }
