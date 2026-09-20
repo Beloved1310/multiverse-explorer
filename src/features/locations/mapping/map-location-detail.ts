@@ -1,6 +1,7 @@
 import type { DeepPartial } from "@apollo/client/utilities";
 import type { GetLocationQuery } from "@/lib/graphql/generated/graphql";
 import { mapCharacter } from "@/features/characters/mapping/map-character";
+import { mapEpisode } from "@/features/episodes/mapping/map-episode";
 import { normalizeText } from "@/lib/normalize-text";
 import type { LocationDetail } from "../domain/location-detail";
 
@@ -24,5 +25,8 @@ export function mapLocationDetail(
     residents: (apiLocation.residents ?? [])
       .filter((resident) => resident !== null && resident !== undefined)
       .map((resident) => mapCharacter(resident)),
+    episodesFeaturingResidents: (apiLocation.episodesFeaturingResidents ?? [])
+      .filter((episode) => episode !== null && episode !== undefined)
+      .map((episode) => mapEpisode(episode)),
   };
 }

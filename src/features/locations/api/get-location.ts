@@ -24,6 +24,15 @@ export const GetLocationQuery = graphql(`
           name
         }
       }
+      episodesFeaturingResidents {
+        id
+        name
+        episode
+        air_date
+        characters {
+          id
+        }
+      }
     }
   }
 `);

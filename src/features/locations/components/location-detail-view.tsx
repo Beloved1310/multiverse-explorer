@@ -1,11 +1,13 @@
 "use client";
 
 import { BackLink } from "@/components/back-link";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { AlertIcon, EmptyIcon } from "@/components/ui/icons";
 import { StatusPanel } from "@/components/ui/status-panel";
 import { CharacterCollectionSection } from "@/features/characters/components/character-collection-section";
+import { EpisodeCollectionSection } from "@/features/episodes/components/episode-collection-section";
 import { useLocationDetail } from "../hooks/use-location-detail";
 
 interface LocationDetailViewProps {
@@ -46,6 +48,27 @@ export function LocationDetailView({ id }: LocationDetailViewProps) {
         emptyLabel="No residents on record."
         itemNoun="resident"
       />
+
+      {location.dimension !== "Unknown" && (
+        <Link
+          href={`/characters?dimension=${encodeURIComponent(location.dimension)}`}
+          className="inline-flex rounded-control border border-border px-4 py-2 text-body font-medium text-foreground hover:bg-surface-elevated focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
+        >
+          Browse characters in this dimension
+        </Link>
+      )}
+
+      <section aria-labelledby="location-related-episodes-title">
+        <h3
+          id="location-related-episodes-title"
+          className="mb-4 text-heading font-semibold text-foreground"
+        >
+          Episodes featuring residents
+        </h3>
+        <EpisodeCollectionSection
+          episodes={location.episodesFeaturingResidents}
+        />
+      </section>
     </div>
   );
 }
