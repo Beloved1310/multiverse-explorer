@@ -17,6 +17,7 @@ import {
   type LocationFilterInput,
   type SortDirection,
 } from "./query-utils";
+import { createSearchRecovery } from "./search-recovery";
 
 const toLocation = (location: {
   id: string;
@@ -130,6 +131,13 @@ export const resolvers = {
         sharedLocations: findSharedLocations(first, second).map(toLocation),
       };
     },
+    searchRecovery: async (
+      _: unknown,
+      args: { input: CharacterFilterInput },
+    ) => {
+      const dataset = await getConnectedDataset();
+      return createSearchRecovery(dataset.characters, args.input);
+    },
   },
   Character: {
     origin: (character: { origin: Parameters<typeof toLocation>[0] | null }) =>
@@ -180,5 +188,11 @@ export const resolvers = {
         episode.characterIds.some((id) => residents.has(id)),
       );
     },
+  },
+  SearchRecoveryOption: {
+    filter: (option: { filter: CharacterFilterInput }) => ({
+      ...option.filter,
+      statuses: option.filter.statuses ?? [],
+    }),
   },
 };

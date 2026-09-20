@@ -1,5 +1,3 @@
-import "server-only";
-
 export const typeDefs = `
   """
   Read-only BFF over an in-memory, connected snapshot of the Rick and Morty
@@ -25,6 +23,8 @@ export const typeDefs = `
     curatedCollections(limit: Int = 6): CuratedCollections!
     "Compares two characters by id: shared episodes and shared origin/current locations. Returns null if either id is missing or the ids match."
     compareCharacters(firstId: ID!, secondId: ID!): CharacterComparison
+    "Returns one useful next question when a character search has no matches."
+    searchRecovery(input: SearchRecoveryInput!): SearchRecovery
   }
 
   "Rick and Morty API-style pagination info for the current page."
@@ -58,6 +58,27 @@ export const typeDefs = `
     sharedEpisodes: [Episode!]!
     "Locations that are the origin or current location of both characters."
     sharedLocations: [Location!]!
+  }
+
+  enum RecoveryStep { NAME STATUS SPECIES DIMENSION MIN_EPISODES }
+  type SearchRecovery {
+    step: RecoveryStep!
+    question: String!
+    options: [SearchRecoveryOption!]!
+  }
+  type SearchRecoveryOption {
+    label: String!
+    value: String!
+    count: Int!
+    filter: RecoveryCharacterFilter!
+  }
+  type RecoveryCharacterFilter {
+    name: String
+    statuses: [String!]!
+    species: String
+    gender: String
+    dimension: String
+    minEpisodes: Int
   }
 
   type Character {
@@ -96,6 +117,14 @@ export const typeDefs = `
     "Matches against the character's current location's dimension, falling back to origin."
     dimension: String
     "Only characters with at least this many episode appearances."
+    minEpisodes: Int
+  }
+  input SearchRecoveryInput {
+    name: String
+    statuses: [String!]
+    species: String
+    gender: String
+    dimension: String
     minEpisodes: Int
   }
   input LocationFilter { name: String, type: String, dimension: String }

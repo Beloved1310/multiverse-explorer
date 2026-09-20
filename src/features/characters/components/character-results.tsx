@@ -15,16 +15,19 @@ import { formatNumber } from "@/lib/format";
 import type { CharacterFilters } from "../filters/character-filters";
 import { useCharacters } from "../hooks/use-characters";
 import { CharacterCard } from "./character-card";
+import { SearchRecovery } from "./search-recovery";
 
 const SKELETON_COUNT = 9;
 
 interface CharacterResultsProps {
   filters: CharacterFilters;
+  onFiltersChange: (patch: Partial<CharacterFilters>) => void;
   onClearFilters: () => void;
 }
 
 export function CharacterResults({
   filters,
+  onFiltersChange,
   onClearFilters,
 }: CharacterResultsProps) {
   const {
@@ -76,17 +79,20 @@ export function CharacterResults({
       )}
 
       {state === "empty" && (
-        <StatusPanel
-          tone="brand"
-          icon={<EmptyIcon className="h-6 w-6" />}
-          heading="No one matches that search."
-          description="Try a different name, or clear your filters to see everyone."
-          action={
-            <Button variant="secondary" onClick={onClearFilters}>
-              Clear filters
-            </Button>
-          }
-        />
+        <>
+          <StatusPanel
+            tone="brand"
+            icon={<EmptyIcon className="h-6 w-6" />}
+            heading="No one matches that search."
+            description="Try one of the suggestions below, or clear your filters to see everyone."
+            action={
+              <Button variant="secondary" onClick={onClearFilters}>
+                Clear filters
+              </Button>
+            }
+          />
+          <SearchRecovery filters={filters} onFiltersChange={onFiltersChange} />
+        </>
       )}
 
       {(state === "loading" || state === "success") && (

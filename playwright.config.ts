@@ -24,7 +24,7 @@ export default defineConfig({
   // that exercises production data-fetching instead of a mocked one (that's
   // the integration layer's job; see tests/integration).
   webServer: {
-    command: `npm run build && npm run start -- -p ${PORT}`,
+    command: `npm run build -- --webpack && npm run start -- -p ${PORT}`,
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,

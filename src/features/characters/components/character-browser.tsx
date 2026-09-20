@@ -27,7 +27,11 @@ export function CharacterBrowser() {
         onSaveFilter={saveFilter}
         onDeleteSavedFilter={deleteFilter}
       />
-      <CharacterResults filters={filters} onClearFilters={clearFilters} />
+      <CharacterResults
+        filters={filters}
+        onFiltersChange={setFilters}
+        onClearFilters={clearFilters}
+      />
     </div>
   );
 }
