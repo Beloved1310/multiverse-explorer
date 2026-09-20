@@ -1,9 +1,11 @@
 "use client";
 
+import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import {
   AlertIcon,
   EmptyIcon,
+  FilmIcon,
   FlagIcon,
   SpinnerIcon,
 } from "@/components/ui/icons";
@@ -12,6 +14,8 @@ import { StatusPanel } from "@/components/ui/status-panel";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { classifyResultState } from "@/lib/classify-result-state";
 import { formatNumber } from "@/lib/format";
+import { groupEpisodesBySeason } from "@/lib/group-episodes-by-season";
+import { pluralize } from "@/lib/pluralize";
 import type { EpisodeFilters } from "../filters/episode-filters";
 import { useEpisodes } from "../hooks/use-episodes";
 import { EpisodeCard } from "./episode-card";
@@ -47,6 +51,11 @@ export function EpisodeResults({
   const sentinelRef = useIntersectionObserver(loadMore, {
     enabled: state === "success" && hasMore && !loadingMore,
   });
+
+  const seasonGroups = useMemo(
+    () => groupEpisodesBySeason(episodes),
+    [episodes],
+  );
 
   return (
     <>
@@ -98,15 +107,42 @@ export function EpisodeResults({
             </p>
           )}
 
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {state === "loading"
-              ? Array.from({ length: SKELETON_COUNT }).map((_, index) => (
-                  <SkeletonCard key={index} variant="banner" />
-                ))
-              : episodes.map((episode) => (
-                  <EpisodeCard key={episode.id} episode={episode} />
-                ))}
-          </div>
+          {state === "loading" ? (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: SKELETON_COUNT }).map((_, index) => (
+                <SkeletonCard key={index} variant="banner" />
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-10">
+              {seasonGroups.map((group) => (
+                <section
+                  key={group.key}
+                  aria-labelledby={`season-${group.key}-title`}
+                >
+                  <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2 border-b border-border pb-2">
+                    <h2
+                      id={`season-${group.key}-title`}
+                      className="flex items-center gap-2 text-heading font-semibold text-foreground"
+                    >
+                      <FilmIcon className="h-4 w-4 text-brand" />
+                      {group.label}
+                    </h2>
+                    <span className="text-caption text-foreground-muted">
+                      {group.episodes.length}{" "}
+                      {pluralize("episode", group.episodes.length)}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    {group.episodes.map((episode) => (
+                      <EpisodeCard key={episode.id} episode={episode} />
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </div>
+          )}
 
           {state === "success" && (
             <div

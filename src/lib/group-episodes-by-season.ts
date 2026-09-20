@@ -1,22 +1,26 @@
-import { parseEpisodeCode } from "@/lib/parse-episode-code";
-import type { CharacterEpisode } from "./character-detail";
+import { parseEpisodeCode } from "./parse-episode-code";
 
-export interface CharacterEpisodeSeason {
+export interface EpisodeSeasonGroup<T> {
   key: string;
   label: string;
   season: number | null;
-  episodes: CharacterEpisode[];
+  episodes: T[];
 }
 
-/** Groups a character's complete episode list into ascending seasons. */
-export function groupCharacterEpisodesBySeason(
-  episodes: CharacterEpisode[],
-): CharacterEpisodeSeason[] {
+/**
+ * Groups any episode-shaped list into ascending seasons by parsing each
+ * item's `code` (e.g. "S01E01"). Generic so both a single character's
+ * episode history and the full episodes catalogue can share one
+ * implementation instead of two copies of the same season-bucketing logic.
+ */
+export function groupEpisodesBySeason<T extends { code: string }>(
+  episodes: T[],
+): EpisodeSeasonGroup<T>[] {
   const seasons = new Map<
     number,
-    Array<{ episode: CharacterEpisode; order: number; episodeNumber: number }>
+    Array<{ episode: T; order: number; episodeNumber: number }>
   >();
-  const other: Array<{ episode: CharacterEpisode; order: number }> = [];
+  const other: Array<{ episode: T; order: number }> = [];
 
   episodes.forEach((episode, order) => {
     const parsed = parseEpisodeCode(episode.code);
@@ -35,7 +39,7 @@ export function groupCharacterEpisodesBySeason(
     seasons.set(parsed.season, seasonEpisodes);
   });
 
-  const groupedSeasons: CharacterEpisodeSeason[] = [...seasons.entries()]
+  const groupedSeasons: EpisodeSeasonGroup<T>[] = [...seasons.entries()]
     .sort(([firstSeason], [secondSeason]) => firstSeason - secondSeason)
     .map(([season, seasonEpisodes]) => ({
       key: `season-${season}`,
