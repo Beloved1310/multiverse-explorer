@@ -1,6 +1,6 @@
 # API
 
-The app is served by a single read-only GraphQL endpoint at `/api/graphql`. It's a backend-for-frontend (BFF): the browser only ever talks to this endpoint, which in turn owns the connection to the upstream Rick and Morty API and all filtering/sorting/relationship logic. See [docs/decisions/008-backend-for-frontend-with-cached-dataset.md](decisions/008-backend-for-frontend-with-cached-dataset.md) for why.
+The app is served by a GraphQL endpoint at `/api/graphql`. It is a backend-for-frontend (BFF): the browser only ever talks to this endpoint, which in turn owns the connection to the upstream Rick and Morty API and all filtering, sorting, relationship, and saved-search logic. Public catalogue queries are read-only. The three saved-search mutations require a Better Auth session. See [docs/decisions/008-backend-for-frontend-with-cached-dataset.md](decisions/008-backend-for-frontend-with-cached-dataset.md) and [docs/decisions/014-server-backed-saved-character-filters.md](decisions/014-server-backed-saved-character-filters.md) for why.
 
 The schema itself is documented inline (see [src/server/graphql/type-defs.ts](../src/server/graphql/type-defs.ts)) and browsable via introspection — run `npm run dev` and open `http://localhost:3000/api/graphql` in a browser to get Apollo Sandbox, which reads those descriptions and lets you run queries interactively. This document is a narrative companion to that, not a replacement for it.
 
@@ -113,6 +113,39 @@ query {
   }
 }
 ```
+
+### Saved character filters
+
+Saved filters belong to the signed-in person. Authentication is served at
+`/api/auth/*` through Better Auth, using name, email, and password. Anonymous
+requests to saved-filter operations receive an `UNAUTHENTICATED` GraphQL error.
+
+```graphql
+query {
+  savedCharacterFilters {
+    id
+    name
+    filter {
+      statuses
+      dimension
+      minEpisodes
+      sort {
+        field
+        direction
+      }
+    }
+  }
+}
+```
+
+Create, import, and delete filters with `createSavedCharacterFilter`,
+`importSavedCharacterFilters`, and `deleteSavedCharacterFilter`. The server
+validates every filter, scopes every operation to the session user, allows up
+to 30 filters per person, and prevents duplicate names for the same person.
+
+The old local-storage value is read only for the one-time import prompt. It is
+removed from the browser only after the import mutation succeeds. URLs remain
+the shareable representation of an active search.
 
 ## Adding a field or query
 
