@@ -20,11 +20,12 @@
   --foreground-muted: var(--color-zinc-600);
   --border: var(--color-zinc-500);
 
-  /* brand: violet for primary actions/links, cyan as a sparing accent */
+  /* brand: violet for primary actions/links, cyan as the locations accent */
   --brand: var(--color-violet-600);
   --brand-strong: var(--color-violet-700);
   --brand-subtle: var(--color-violet-50);
   --accent: var(--color-cyan-700);
+  --accent-subtle: var(--color-cyan-50);
 
   /* status: colour + the Badge component always renders a text label too */
   --status-alive-fg: var(--color-green-700);
@@ -47,6 +48,7 @@
     --brand-strong: var(--color-violet-300);
     --brand-subtle: var(--color-violet-950);
     --accent: var(--color-cyan-300);
+    --accent-subtle: var(--color-cyan-950);
 
     --status-alive-fg: var(--color-green-300);
     --status-alive-bg: var(--color-green-900);
@@ -68,6 +70,7 @@
   --color-brand-strong: var(--brand-strong);
   --color-brand-subtle: var(--brand-subtle);
   --color-accent: var(--accent);
+  --color-accent-subtle: var(--accent-subtle);
 
   --color-status-alive-fg: var(--status-alive-fg);
   --color-status-alive-bg: var(--status-alive-bg);

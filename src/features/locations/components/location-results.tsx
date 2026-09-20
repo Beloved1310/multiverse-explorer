@@ -1,10 +1,12 @@
 "use client";
 
+import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import {
   AlertIcon,
   EmptyIcon,
   FlagIcon,
+  MapPinIcon,
   SpinnerIcon,
 } from "@/components/ui/icons";
 import { SkeletonCard } from "@/components/ui/skeleton-card";
@@ -12,6 +14,8 @@ import { StatusPanel } from "@/components/ui/status-panel";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { classifyResultState } from "@/lib/classify-result-state";
 import { formatNumber } from "@/lib/format";
+import { pluralize } from "@/lib/pluralize";
+import { groupLocationsByDimension } from "../domain/group-locations-by-dimension";
 import type { LocationFilters } from "../filters/location-filters";
 import { useLocations } from "../hooks/use-locations";
 import { LocationCard } from "./location-card";
@@ -47,6 +51,11 @@ export function LocationResults({
   const sentinelRef = useIntersectionObserver(loadMore, {
     enabled: state === "success" && hasMore && !loadingMore,
   });
+
+  const dimensionGroups = useMemo(
+    () => groupLocationsByDimension(locations),
+    [locations],
+  );
 
   return (
     <>
@@ -98,15 +107,46 @@ export function LocationResults({
             </p>
           )}
 
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {state === "loading"
-              ? Array.from({ length: SKELETON_COUNT }).map((_, index) => (
-                  <SkeletonCard key={index} variant="banner" />
-                ))
-              : locations.map((location) => (
-                  <LocationCard key={location.id} location={location} />
-                ))}
-          </div>
+          {state === "loading" ? (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: SKELETON_COUNT }).map((_, index) => (
+                <SkeletonCard key={index} variant="banner" />
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-10">
+              {dimensionGroups.map((group) => (
+                <section
+                  key={group.key}
+                  aria-labelledby={`dimension-${group.key}-title`}
+                >
+                  <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2 border-b border-border pb-2">
+                    <h2
+                      id={`dimension-${group.key}-title`}
+                      className="flex items-center gap-2 text-heading font-semibold text-foreground"
+                    >
+                      <MapPinIcon className="h-4 w-4 text-accent" />
+                      {group.dimension}
+                    </h2>
+                    <span className="text-caption text-foreground-muted">
+                      {group.locations.length}{" "}
+                      {pluralize("location", group.locations.length)}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    {group.locations.map((location) => (
+                      <LocationCard
+                        key={location.id}
+                        location={location}
+                        showDimension={false}
+                      />
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </div>
+          )}
 
           {state === "success" && (
             <div
