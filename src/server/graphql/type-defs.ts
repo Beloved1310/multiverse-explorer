@@ -86,7 +86,13 @@ export const typeDefs = `
     origin: Location, location: Location, episode: [Episode]
     "Number of episodes this character appears in."
     episodeCount: Int
+    "Episode counts by season, ascending; a null season groups episodes whose code didn't match SxxEyy."
+    episodeSeasons: [CharacterEpisodeSeason!]!
+    "One season's episodes for this character, paginated (page size 5). Pass season: null for the unparsed-code group."
+    episodesInSeason(season: Int, page: Int): CharacterEpisodesPage!
   }
+  type CharacterEpisodeSeason { season: Int, count: Int! }
+  type CharacterEpisodesPage { info: PageInfo!, results: [Episode!]! }
   type Episode {
     id: ID, name: String
     "Production code, e.g. \\"S01E01\\"."

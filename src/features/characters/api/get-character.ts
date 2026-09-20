@@ -17,11 +17,10 @@ export const GetCharacterQuery = graphql(`
         id
         name
       }
-      episode {
-        id
-        name
-        episode
-        air_date
+      episodeCount
+      episodeSeasons {
+        season
+        count
       }
     }
   }

@@ -156,6 +156,44 @@ export function findSharedEpisodes(
   );
 }
 
+/** Episode counts by season for one character's episode list, ascending; a null season groups episodes whose code didn't match SxxEyy. */
+export function summarizeCharacterEpisodeSeasons(
+  episodeIds: string[],
+  episodes: ConnectedEpisode[],
+): Array<{ season: number | null; count: number }> {
+  const ids = new Set(episodeIds);
+  const counts = new Map<number | null, number>();
+
+  episodes.forEach((episode) => {
+    if (!ids.has(episode.id)) return;
+    counts.set(episode.season, (counts.get(episode.season) ?? 0) + 1);
+  });
+
+  return [...counts.entries()]
+    .sort(([firstSeason], [secondSeason]) => {
+      if (firstSeason === secondSeason) return 0;
+      if (firstSeason === null) return 1;
+      if (secondSeason === null) return -1;
+      return firstSeason - secondSeason;
+    })
+    .map(([season, count]) => ({ season, count }));
+}
+
+/** One character's episodes within a single season (or the unparsed-code group when season is null), in episode order. */
+export function selectCharacterEpisodesInSeason(
+  episodeIds: string[],
+  season: number | null,
+  episodes: ConnectedEpisode[],
+): ConnectedEpisode[] {
+  const ids = new Set(episodeIds);
+  return episodes
+    .filter((episode) => ids.has(episode.id) && episode.season === season)
+    .sort(
+      (first, second) =>
+        (first.episodeNumber ?? 0) - (second.episodeNumber ?? 0),
+    );
+}
+
 /** Locations that are the origin or current location of both characters. */
 export function findSharedLocations(
   first: ConnectedCharacter,

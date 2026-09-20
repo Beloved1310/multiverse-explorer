@@ -3,7 +3,7 @@ import type { GetCharacterQuery } from "@/lib/graphql/generated/graphql";
 import { normalizeText } from "@/lib/normalize-text";
 import type {
   CharacterDetail,
-  CharacterEpisode,
+  CharacterEpisodeSeasonSummary,
   CharacterLocationRef,
 } from "../domain/character-detail";
 import {
@@ -13,20 +13,20 @@ import {
 
 type FullApiCharacterDetail = NonNullable<GetCharacterQuery["character"]>;
 type FullApiLocationRef = NonNullable<FullApiCharacterDetail["origin"]>;
-type FullApiEpisode = NonNullable<
-  NonNullable<FullApiCharacterDetail["episode"]>[number]
+type FullApiEpisodeSeason = NonNullable<
+  NonNullable<FullApiCharacterDetail["episodeSeasons"]>[number]
 >;
 
 /**
- * `returnPartialData` (used so name/image can render before episodes
- * arrive) means Apollo itself types the query result as a `DeepPartial` --
- * every field, at every depth, can genuinely be `undefined` at runtime,
- * not just the top-level ones. The mapper's input type reflects that
- * honestly instead of casting it away.
+ * `returnPartialData` (used so name/image can render before the episode
+ * summary arrives) means Apollo itself types the query result as a
+ * `DeepPartial` -- every field, at every depth, can genuinely be
+ * `undefined` at runtime, not just the top-level ones. The mapper's input
+ * type reflects that honestly instead of casting it away.
  */
 export type ApiCharacterDetail = DeepPartial<FullApiCharacterDetail>;
 type ApiLocationRef = DeepPartial<FullApiLocationRef>;
-type ApiEpisode = DeepPartial<FullApiEpisode>;
+type ApiEpisodeSeason = DeepPartial<FullApiEpisodeSeason>;
 
 function mapLocationRef(
   apiLocationRef: ApiLocationRef | null | undefined,
@@ -37,12 +37,12 @@ function mapLocationRef(
   };
 }
 
-function mapEpisode(apiEpisode: ApiEpisode): CharacterEpisode {
+function mapEpisodeSeason(
+  apiSeason: ApiEpisodeSeason,
+): CharacterEpisodeSeasonSummary {
   return {
-    id: apiEpisode.id ?? "",
-    name: normalizeText(apiEpisode.name),
-    code: normalizeText(apiEpisode.episode),
-    airDate: normalizeText(apiEpisode.air_date),
+    season: apiSeason.season ?? null,
+    count: apiSeason.count ?? 0,
   };
 }
 
@@ -58,11 +58,12 @@ export function mapCharacterDetail(
     gender: normalizeCharacterGender(apiCharacter.gender ?? null),
     origin: mapLocationRef(apiCharacter.origin),
     location: mapLocationRef(apiCharacter.location),
+    episodeCount: apiCharacter.episodeCount ?? 0,
     // Genuinely absent at runtime whenever this field hasn't arrived from
-    // the network yet -- `?? []` renders an empty episode list for that
+    // the network yet -- `?? []` renders an empty season list for that
     // instant rather than throwing.
-    episodes: (apiCharacter.episode ?? [])
-      .filter((episode) => episode !== null && episode !== undefined)
-      .map((episode) => mapEpisode(episode)),
+    episodeSeasons: (apiCharacter.episodeSeasons ?? [])
+      .filter((season) => season !== null && season !== undefined)
+      .map((season) => mapEpisodeSeason(season)),
   };
 }

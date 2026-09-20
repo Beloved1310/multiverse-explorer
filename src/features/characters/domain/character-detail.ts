@@ -14,6 +14,11 @@ export interface CharacterEpisode {
   airDate: string;
 }
 
+export interface CharacterEpisodeSeasonSummary {
+  season: number | null;
+  count: number;
+}
+
 export interface CharacterDetail {
   id: string;
   name: string;
@@ -23,5 +28,7 @@ export interface CharacterDetail {
   gender: string;
   origin: CharacterLocationRef;
   location: CharacterLocationRef;
-  episodes: CharacterEpisode[];
+  episodeCount: number;
+  /** Season/count summary only -- episodes for a given season are fetched paginated, on demand, once that season is expanded. */
+  episodeSeasons: CharacterEpisodeSeasonSummary[];
 }
