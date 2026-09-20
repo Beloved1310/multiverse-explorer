@@ -29,7 +29,11 @@ describe("CharacterBrowser (integration: filter bar + results + GraphQL layer)",
       {
         request: {
           query: GetCharactersQuery,
-          variables: { filter: undefined, page: 1 },
+          variables: {
+            filter: undefined,
+            page: 1,
+            sort: { field: "NAME", direction: "ASC" },
+          },
         },
         result: { data: buildCharactersResponse() },
       },
@@ -60,14 +64,22 @@ describe("CharacterBrowser (integration: filter bar + results + GraphQL layer)",
       {
         request: {
           query: GetCharactersQuery,
-          variables: { filter: undefined, page: 1 },
+          variables: {
+            filter: undefined,
+            page: 1,
+            sort: { field: "NAME", direction: "ASC" },
+          },
         },
         result: { data: buildCharactersResponse() },
       },
       {
         request: {
           query: GetCharactersQuery,
-          variables: { filter: { name: "morty" }, page: 1 },
+          variables: {
+            filter: { name: "morty" },
+            page: 1,
+            sort: { field: "NAME", direction: "ASC" },
+          },
         },
         result: {
           data: buildCharactersResponse([
@@ -107,14 +119,22 @@ describe("CharacterBrowser (integration: filter bar + results + GraphQL layer)",
       {
         request: {
           query: GetCharactersQuery,
-          variables: { filter: undefined, page: 1 },
+          variables: {
+            filter: undefined,
+            page: 1,
+            sort: { field: "NAME", direction: "ASC" },
+          },
         },
         result: { data: buildCharactersResponse() },
       },
       {
         request: {
           query: GetCharactersQuery,
-          variables: { filter: { status: "alive" }, page: 1 },
+          variables: {
+            filter: { statuses: ["alive"] },
+            page: 1,
+            sort: { field: "NAME", direction: "ASC" },
+          },
         },
         result: { data: buildCharactersResponse() },
       },
@@ -131,12 +151,12 @@ describe("CharacterBrowser (integration: filter bar + results + GraphQL layer)",
     const clearButton = screen.getByRole("button", { name: "Clear all" });
     expect(clearButton).toBeDisabled();
 
-    await user.selectOptions(screen.getByLabelText("Status"), "alive");
+    await user.click(screen.getByLabelText("Alive"));
 
     expect(routerReplace).toHaveBeenLastCalledWith("/?status=alive", {
       scroll: false,
     });
-    expect(await screen.findByText("1")).toBeInTheDocument();
+    expect((await screen.findAllByText("1")).length).toBeGreaterThan(0);
     expect(clearButton).toBeEnabled();
 
     await user.click(clearButton);

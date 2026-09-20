@@ -7,6 +7,7 @@ import { mapCharacter } from "../mapping/map-character";
 import type { Character } from "../domain/character";
 import {
   toGraphQLCharacterFilter,
+  toGraphQLCharacterSort,
   type CharacterFilters,
 } from "../filters/character-filters";
 
@@ -38,6 +39,7 @@ export function useCharacters(filters: CharacterFilters): UseCharactersResult {
       variables: {
         filter: toGraphQLCharacterFilter(filters),
         page: FIRST_PAGE,
+        sort: toGraphQLCharacterSort(filters.sort),
       },
       // re-flags `loading` during a retry, so the UI can fall back to the
       // same skeleton state rather than needing a separate "retrying" state
