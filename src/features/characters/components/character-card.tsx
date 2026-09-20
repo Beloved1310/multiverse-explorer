@@ -17,9 +17,14 @@ const STATUS_ACCENT: Record<CharacterStatus, string> = {
 
 interface CharacterCardProps {
   character: Character;
+  /** Only the first image in an above-the-fold collection should be eager. */
+  eagerImage?: boolean;
 }
 
-export function CharacterCard({ character }: CharacterCardProps) {
+export function CharacterCard({
+  character,
+  eagerImage = false,
+}: CharacterCardProps) {
   return (
     <Link
       href={`/characters/${character.id}`}
@@ -36,7 +41,7 @@ export function CharacterCard({ character }: CharacterCardProps) {
               src={character.imageUrl}
               alt={`Portrait of ${character.name}`}
               fill
-              loading="lazy"
+              loading={eagerImage ? "eager" : "lazy"}
               sizes="(min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw"
               className="object-cover transition-transform duration-500 group-hover:scale-[1.04] motion-reduce:transition-none"
             />

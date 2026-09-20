@@ -78,8 +78,12 @@ export function CharacterCollectionSection({
           </p>
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {visible.map((character) => (
-              <CharacterCard key={character.id} character={character} />
+            {visible.map((character, index) => (
+              <CharacterCard
+                key={character.id}
+                character={character}
+                eagerImage={index === 0}
+              />
             ))}
           </div>
 

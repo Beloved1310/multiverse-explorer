@@ -110,8 +110,12 @@ export function CharacterResults({
               ? Array.from({ length: SKELETON_COUNT }).map((_, index) => (
                   <SkeletonCard key={index} />
                 ))
-              : characters.map((character) => (
-                  <CharacterCard key={character.id} character={character} />
+              : characters.map((character, index) => (
+                  <CharacterCard
+                    key={character.id}
+                    character={character}
+                    eagerImage={index === 0}
+                  />
                 ))}
           </div>
 
