@@ -43,7 +43,7 @@ export default function Home() {
           Multiverse Explorer
         </h1>
         <p className="mx-auto max-w-xl text-body text-foreground-muted sm:text-heading">
-          Every being, every reality &mdash; search the multiverse.
+          Every being and every reality. Search the multiverse.
         </p>
       </div>
 

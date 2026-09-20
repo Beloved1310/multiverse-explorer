@@ -68,7 +68,7 @@ describe("LocationDetailView (integration: residents + related episodes)", () =>
 
     expect(
       await screen.findByRole("heading", {
-        level: 2,
+        level: 1,
         name: "Citadel of Ricks",
       }),
     ).toBeInTheDocument();
@@ -100,7 +100,7 @@ describe("LocationDetailView (integration: residents + related episodes)", () =>
       </MockedProvider>,
     );
 
-    await screen.findByRole("heading", { level: 2, name: "Citadel of Ricks" });
+    await screen.findByRole("heading", { level: 1, name: "Citadel of Ricks" });
     expect(
       screen.queryByRole("link", { name: /Browse characters/ }),
     ).not.toBeInTheDocument();
@@ -182,7 +182,7 @@ describe("LocationDetailView (integration: residents + related episodes)", () =>
 
     expect(
       await screen.findByRole("heading", {
-        level: 2,
+        level: 1,
         name: "Citadel of Ricks",
       }),
     ).toBeInTheDocument();

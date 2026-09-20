@@ -13,7 +13,7 @@ test.describe("Character comparison", () => {
     await page.getByLabel("First character").fill("rick sanchez");
     await page
       .getByRole("list", { name: "First character matches" })
-      .getByRole("button", { name: "Rick Sanchez", exact: true })
+      .getByRole("option", { name: /Rick Sanchez/ })
       .first()
       .click();
     // setCharacter() builds the next URL from the current searchParams
@@ -25,7 +25,7 @@ test.describe("Character comparison", () => {
     await page.getByLabel("Second character").fill("morty smith");
     await page
       .getByRole("list", { name: "Second character matches" })
-      .getByRole("button", { name: "Morty Smith", exact: true })
+      .getByRole("option", { name: /Morty Smith/ })
       .first()
       .click();
 
@@ -57,7 +57,7 @@ test.describe("Character comparison", () => {
     await page.getByLabel("First character").fill("rick sanchez");
     await page
       .getByRole("list", { name: "First character matches" })
-      .getByRole("button", { name: "Rick Sanchez", exact: true })
+      .getByRole("option", { name: /Rick Sanchez/ })
       .first()
       .click();
     await expect(page).toHaveURL(/first=\d+/);
@@ -65,7 +65,7 @@ test.describe("Character comparison", () => {
     await page.getByLabel("Second character").fill("rick sanchez");
     await page
       .getByRole("list", { name: "Second character matches" })
-      .getByRole("button", { name: "Rick Sanchez", exact: true })
+      .getByRole("option", { name: /Rick Sanchez/ })
       .first()
       .click();
 

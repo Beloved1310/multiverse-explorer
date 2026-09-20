@@ -20,10 +20,10 @@
   --foreground-muted: var(--color-zinc-600);
   --border: var(--color-zinc-500);
 
-  /* brand: violet for primary actions/links, cyan as the locations accent */
-  --brand: var(--color-violet-600);
-  --brand-strong: var(--color-violet-700);
-  --brand-subtle: var(--color-violet-50);
+  /* acid green is the product accent; cyan keeps locations distinct. */
+  --brand: var(--color-lime-700);
+  --brand-strong: var(--color-lime-800);
+  --brand-subtle: var(--color-lime-50);
   --accent: var(--color-cyan-700);
   --accent-subtle: var(--color-cyan-50);
 
@@ -44,9 +44,9 @@
     --foreground-muted: var(--color-zinc-400);
     --border: var(--color-zinc-500);
 
-    --brand: var(--color-violet-400);
-    --brand-strong: var(--color-violet-300);
-    --brand-subtle: var(--color-violet-950);
+    --brand: var(--color-lime-300);
+    --brand-strong: var(--color-lime-200);
+    --brand-subtle: var(--color-lime-950);
     --accent: var(--color-cyan-300);
     --accent-subtle: var(--color-cyan-950);
 
@@ -93,27 +93,12 @@
   --text-caption: 0.875rem;
   --text-caption--line-height: 1.4;
 
-  --font-sans: var(--font-dm-sans);
-  --font-display: var(--font-fraunces);
+  --font-sans: var(--font-geist-sans);
+  --font-display: var(--font-geist-sans);
 }
 
 body {
   background-color: var(--color-background);
-  /* a soft two-tone "portal glow" wash -- brand identity, not decoration
-     for its own sake -- fades into the ordinary background within the
-     first viewport so it never competes with content. */
-  background-image:
-    radial-gradient(
-      ellipse 70% 45% at 8% -10%,
-      color-mix(in oklch, var(--color-brand) 14%, transparent),
-      transparent
-    ),
-    radial-gradient(
-      ellipse 55% 35% at 100% 0%,
-      color-mix(in oklch, var(--color-accent) 12%, transparent),
-      transparent
-    );
-  background-repeat: no-repeat;
   color: var(--color-foreground);
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 }

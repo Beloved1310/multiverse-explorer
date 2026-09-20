@@ -55,7 +55,7 @@ describe("CharacterBrowser (integration: filter bar + results + GraphQL layer)",
     // <option> text in the (always-present-in-the-DOM) species/status
     // filter <select>s, so an unscoped query would be ambiguous.
     const card = screen.getByRole("link", {
-      name: /Portrait of Rick Sanchez/i,
+      name: /View Rick Sanchez, Alive, 1 episode/i,
     });
     expect(within(card).getByText("Human")).toBeInTheDocument();
     expect(within(card).getByText("Citadel of Ricks")).toBeInTheDocument();
@@ -113,7 +113,9 @@ describe("CharacterBrowser (integration: filter bar + results + GraphQL layer)",
       });
     });
 
-    expect(await screen.findByText("Morty Smith")).toBeInTheDocument();
+    expect(
+      await screen.findByRole("link", { name: /View Morty Smith/i }),
+    ).toBeInTheDocument();
     expect(screen.queryByText("Rick Sanchez")).not.toBeInTheDocument();
   });
 
@@ -151,6 +153,8 @@ describe("CharacterBrowser (integration: filter bar + results + GraphQL layer)",
     );
 
     await screen.findByText("Rick Sanchez");
+
+    await user.click(screen.getByRole("button", { name: "Filters and sort" }));
 
     const clearButton = screen.getByRole("button", { name: "Clear all" });
     expect(clearButton).toBeDisabled();
@@ -279,7 +283,9 @@ describe("CharacterBrowser (integration: filter bar + results + GraphQL layer)",
     // If `keyArgs` ever grew to include `page`, or the merge stopped
     // resetting on page 1, this would show three characters instead of
     // the new filter's own single result.
-    expect(await screen.findByText("Beth Smith")).toBeInTheDocument();
+    expect(
+      await screen.findByRole("link", { name: /View Beth Smith/i }),
+    ).toBeInTheDocument();
     expect(screen.queryByText("Rick Sanchez")).not.toBeInTheDocument();
     expect(screen.queryByText("Morty Smith")).not.toBeInTheDocument();
   });

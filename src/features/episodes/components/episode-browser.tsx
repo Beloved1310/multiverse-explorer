@@ -1,6 +1,7 @@
 "use client";
 
 import { useEpisodeFilters } from "../hooks/use-episode-filters";
+import { ExplorerIntro } from "@/components/explorer-intro";
 import { EpisodeFilterBar } from "./episode-filter-bar";
 import { EpisodeResults } from "./episode-results";
 
@@ -10,12 +11,11 @@ export function EpisodeBrowser() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-display font-bold text-foreground">Episodes</h1>
-        <p className="text-body text-foreground-muted">
-          Search episodes by name or code.
-        </p>
-      </div>
+      <ExplorerIntro
+        eyebrow="Episode guide"
+        title="Episodes"
+        description="Browse every episode by title or production code, organised by season."
+      />
       <EpisodeFilterBar
         filters={filters}
         onFiltersChange={setFilters}

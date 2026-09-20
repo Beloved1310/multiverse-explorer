@@ -31,9 +31,9 @@ export function EpisodeDetailView({ id }: EpisodeDetailViewProps) {
             <span className="inline-block rounded-control bg-brand-subtle px-2.5 py-1 text-caption font-semibold text-brand">
               {episode.code}
             </span>
-            <h2 className="text-display font-bold text-foreground">
+            <h1 className="text-display font-bold text-foreground">
               {episode.name}
-            </h2>
+            </h1>
           </div>
           <span className="flex items-center gap-1.5 text-caption text-foreground-muted">
             <CalendarIcon className="h-4 w-4" />
